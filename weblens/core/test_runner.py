@@ -35,8 +35,6 @@ class TestCase:
     name: str
     description: str
     test_function: Callable
-    browsers: List[str] = field(default_factory=lambda: ["browser_use_cloud"])
-    profiles: List[str] = field(default_factory=list)
     tags: List[str] = field(default_factory=list)
 
 
@@ -53,13 +51,11 @@ class TestRunner:
                      description: str,
                      test_function: Callable,
                      tags: Optional[List[str]] = None):
-        """Register a test case"""
+        """Register a test case using natural language approach"""
         test_case = TestCase(
             name=name,
             description=description,
             test_function=test_function,
-            browsers=["browser_use_cloud"],  # Fixed value for cloud
-            profiles=[],  # Not used in cloud mode
             tags=tags or []
         )
         self.test_cases.append(test_case)
@@ -68,15 +64,17 @@ class TestRunner:
     async def run_single_test(self, 
                             test_case: TestCase, 
                             task_description: Optional[str] = None) -> TestResult:
-        """Run a single test case using browser-use cloud"""
+        """Run a single test case using browser-use cloud with natural language instructions"""
         start_time = time.time()
         test_name = f"{test_case.name}_{int(start_time)}"
         
         logger.info(f"Running test: {test_name}")
         
         try:
-            # Create agent for this test
+            # Create agent for this test with natural language description
             task = task_description or test_case.description or f"Execute test: {test_case.name}"
+            
+            # Create agent with natural language instructions
             agent = await self.browser_manager.create_agent(task, test_name)
             
             # Execute test function with agent
@@ -88,7 +86,7 @@ class TestRunner:
             duration = time.time() - start_time
             result = TestResult(
                 name=test_name,
-                browser="browser_use_cloud",
+                browser="browser-use",
                 profile=None,
                 status="passed",
                 duration=duration
@@ -102,7 +100,7 @@ class TestRunner:
             
             result = TestResult(
                 name=test_name,
-                browser="browser_use_cloud",
+                browser="browser-use",
                 profile=None,
                 status="failed",
                 duration=duration,
@@ -252,13 +250,13 @@ class TestRunner:
 def weblens_test(name: str, 
                 description: str = "",
                 tags: Optional[List[str]] = None):
-    """Decorator to register test functions"""
+    """Decorator to register test functions using natural language approach"""
     def decorator(func):
-        # This would typically be registered with a global test runner instance
+        # Store test info as attributes of the function
         func._weblens_test_info = {
             "name": name,
             "description": description,
-            "tags": tags
+            "tags": tags or []
         }
         return func
     return decorator
