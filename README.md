@@ -80,6 +80,7 @@ WebLens is a modern testing framework leveraging AI through the browser-use clou
 - **Visual Verification**: Ability to recognize and interact with UI without hard-coded selectors
 - **Parallel Execution**: Run tests simultaneously on the cloud for increased performance
 - **Easy Configuration**: Simple setup with just an API key
+- **Natural Language Testing**: Write tests in plain English or Vietnamese with no selectors
 
 ## ⏱️ Quick Start
 
@@ -90,6 +91,9 @@ cd WebLens
 
 # Run quick start script
 ./quick_start.sh
+
+# Run login test specific example
+./login_test_quickstart.sh
 ```
 
 For detailed installation and usage instructions, see [INSTRUCTION.md](./INSTRUCTION.md)
@@ -97,7 +101,9 @@ For detailed installation and usage instructions, see [INSTRUCTION.md](./INSTRUC
 ## 📖 Documentation
 
 - [Usage Guide](./INSTRUCTION.md) - Detailed instructions for installation and using WebLens
+- [Comprehensive Natural Language Guide](./docs/natural_language_guide_full.md) - Complete guide to the natural language approach
 - [Natural Language Approach](./docs/natural_language_approach.md) - Guide to using natural language testing
+- [Login Testing Guide](./docs/login_testing_guide.md) - Guide for testing login functionality
 - [Browser Use Cloud API](./docs/browser_use_cloud_api.md) - Documentation about the API used in WebLens
 - [Contributing Guide](./CONTRIBUTING.md) - Guidelines for contributing to the project
 - [Change Log](./docs/THAY_DOI.md) - Details about recent changes to direct natural language approach
@@ -111,11 +117,13 @@ WebLens/
 │   ├── utils/                 # Utility functions
 │   └── profiles/              # Browser profile management
 ├── docs/                      # Documentation
-│   └── natural_language_approach.md  # Guide to natural language testing
+│   ├── natural_language_approach.md  # Guide to natural language testing
+│   └── login_testing_guide.md        # Guide for testing login functionality
 ├── examples/                  # Usage examples
 │   ├── natural_language_test.py      # Basic natural language example
-│   ├── advanced_natural_language_test.py  # Advanced natural language example
-│   └── direct_browser_use.py  # Direct browser-use API example
+│   ├── login_test_example.py         # Login testing example
+│   ├── advanced_natural_assertions.py # Advanced assertions using natural language
+│   └── direct_browser_use.py         # Direct browser-use API example
 ├── tests/                     # Framework tests
 ├── INSTRUCTION.md             # Detailed instructions
 └── README.md                  # Project introduction

@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
 """
-Simple test to verify WebLens framework
+Simple test to verify WebLens framework using natural language
 """
 import asyncio
 import os
-from weblens.core.test_runner import TestRunner
+from weblens.core.test_runner import TestRunner, weblens_test
 from weblens.utils.logger import setup_logging, get_logger
 
 # Setup logging
 setup_logging(level="INFO")
 logger = get_logger(__name__)
 
-
-async def simple_test_function(agent):
-    """Simple test function"""
-    logger.info("Running simple test...")
-    # Just a simple assertion
-    assert True, "This should pass"
+@weblens_test(
+    name="simple_natural_language_test",
+    description="Go to example.com and verify the page loads correctly",
+    tags=["smoke"]
+)
+async def simple_test_function(browser):
+    """Simple test function using natural language"""
+    logger.info("Running simple natural language test...")
+    
+    # Execute natural language task from the description
+    result = await browser.run()
+    
+    # Simple assertion
+    assert "page loads correctly" in result.lower(), "Page should load correctly"
+    
     logger.info("Simple test completed!")
 
 
@@ -27,12 +36,13 @@ async def main():
     # Create test runner
     runner = TestRunner()
     
-    # Register test manually
+    # Register test using the decorator info
+    info = simple_test_function._weblens_test_info
     runner.register_test(
-        name="simple_test",
-        description="A simple test to verify framework",
+        name=info["name"],
+        description=info["description"],
         test_function=simple_test_function,
-        tags=["smoke"]
+        tags=info["tags"]
     )
     
     # Run tests

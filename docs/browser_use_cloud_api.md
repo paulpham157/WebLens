@@ -48,6 +48,7 @@ WebLens yêu cầu API key để kết nối với Browser Use Cloud API. Bạn 
 ```bash
 # Trong tệp .env
 BROWSER_USE_API_KEY=your_api_key_here
+BROWSER_USE_BASE_URL=https://your-custom-api-endpoint.com/api/v1
 ```
 
 ### Tùy chỉnh Base URL
