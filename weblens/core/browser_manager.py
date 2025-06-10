@@ -11,7 +11,9 @@ logger = logging.getLogger(__name__)
 
 # Try to import browser-use, with fallback for development
 try:
-    from browser_use import Agent
+    from browser_use import Agent as BrowserUseAgent
+    # Define a type alias to avoid generic type issues
+    Agent = BrowserUseAgent  # type: ignore
     BROWSER_USE_AVAILABLE = True
 except ImportError:
     logger.warning("browser-use package not available. Using mock for development.")

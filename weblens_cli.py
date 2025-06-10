@@ -7,6 +7,8 @@ import asyncio
 import sys
 from pathlib import Path
 import importlib.util
+from typing import Union, Optional, List
+
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -16,24 +18,30 @@ from weblens.utils.logger import setup_logging, get_logger
 from weblens.config import config
 
 
-def load_test_module(module_path: str):
+def load_test_module(module_path: Union[str, Path]):
     """Load test module from file path"""
     module_path = Path(module_path)
     if not module_path.exists():
         raise FileNotFoundError(f"Test module not found: {module_path}")
     
     spec = importlib.util.spec_from_file_location("test_module", module_path)
+    if spec is None:
+        raise ImportError(f"Could not create module spec from {module_path}")
+    
+    if spec.loader is None:
+        raise ImportError(f"Module loader is None for {module_path}")
+        
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
 async def run_tests_from_module(module_path: str, 
-                               browsers: list = None,
-                               profiles: list = None,
-                               tags: list = None,
+                               browsers: Optional[List[str]] = None,
+                               profiles: Optional[List[str]] = None,
+                               tags: Optional[List[str]] = None,
                                parallel: bool = True,
-                               test_names: list = None):
+                               test_names: Optional[List[str]] = None):
     """Run tests from a Python module"""
     logger = get_logger(__name__)
     
@@ -58,9 +66,7 @@ async def run_tests_from_module(module_path: str,
                 name=info['name'],
                 description=info['description'],
                 test_function=attr,
-                browsers=info['browsers'],
-                profiles=info['profiles'],
-                tags=info['tags']
+                tags=info.get('tags')
             )
             test_count += 1
     
@@ -74,8 +80,6 @@ async def run_tests_from_module(module_path: str,
     try:
         results = await runner.run_tests(
             test_names=test_names,
-            browsers=browsers,
-            profiles=profiles,
             tags=tags,
             parallel=parallel
         )
@@ -88,7 +92,7 @@ async def run_tests_from_module(module_path: str,
         return False
 
 
-async def list_profiles(browser: str = None):
+async def list_profiles(browser: Optional[str] = None):
     """List available profiles"""
     profile_manager = ProfileManager()
     profiles = profile_manager.list_profiles(browser)
@@ -103,7 +107,8 @@ async def list_profiles(browser: str = None):
     for profile in profiles:
         print(f"Name: {profile.name}")
         print(f"Browser: {profile.browser}")
-        print(f"Viewport: {profile.viewport['width']}x{profile.viewport['height']}")
+        if profile.viewport:
+            print(f"Viewport: {profile.viewport['width']}x{profile.viewport['height']}")
         if profile.user_agent:
             print(f"User Agent: {profile.user_agent[:60]}...")
         print("-" * 30)
@@ -158,7 +163,8 @@ async def create_profile_interactive():
     
     print(f"\nProfile '{name}' created successfully!")
     print(f"Browser: {profile.browser}")
-    print(f"Viewport: {profile.viewport['width']}x{profile.viewport['height']}")
+    if profile.viewport:
+        print(f"Viewport: {profile.viewport['width']}x{profile.viewport['height']}")
 
 
 def main():
