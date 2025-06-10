@@ -1,86 +1,86 @@
-# WebLens - Hướng Dẫn Sử Dụng
+# WebLens - User Guide
 
-WebLens là framework testing dựa trên AI, cho phép viết test bằng ngôn ngữ tự nhiên thay vì sử dụng các phương thức selector-based truyền thống. Framework kết nối với browser-use cloud API để tự động hóa trình duyệt dựa trên các hướng dẫn viết bằng ngôn ngữ tự nhiên.
+WebLens is an AI-driven testing framework that enables writing tests in natural language instead of using traditional selector-based methods. The framework connects to the browser-use cloud API to automate browsers based on instructions written in natural language.
 
-## 📦 Cài Đặt
+## 📦 Installation
 
-### Yêu Cầu Hệ Thống
+### System Requirements
 
 - Python 3.9+
-- Conda (Miniconda hoặc Anaconda)
-- macOS, Windows, hoặc Linux
+- Conda (Miniconda or Anaconda)
+- macOS, Windows, or Linux
 
-### Cài Đặt với Conda (Khuyến nghị)
+### Installation with Conda (Recommended)
 
 ```bash
 # Clone repository
 git clone <repository-url>
 cd WebLens
 
-# Tạo conda environment
+# Create conda environment
 conda env create -f environment.yml
 
-# Kích hoạt environment
+# Activate environment
 conda activate weblens
 
-# Chạy setup script
+# Run setup script
 ./setup.sh
 
-# Hoặc setup thủ công
+# Or manual setup
 make setup
 ```
 
-### Cài Đặt Dependencies Thủ Công
+### Manual Dependencies Installation
 
 ```bash
-# Nếu chưa có conda environment
+# If you don't have a conda environment yet
 conda create -n weblens python=3.9
 conda activate weblens
 
-# Cài đặt dependencies
+# Install dependencies
 conda install -c conda-forge pydantic colorama rich pytest pytest-asyncio python-dotenv black flake8 mypy
 pip install browser-use>=0.2.0 asyncio-throttle
 ```
 
-### Cấu Hình Environment
+### Environment Configuration
 
 ```bash
-# Copy file cấu hình mẫu
+# Copy example configuration file
 cp .env.example .env
 
-# Chỉnh sửa file .env với Browser-use API key của bạn
-# Cần thiết cho browser-use cloud functionality
+# Edit .env file with your Browser-use API key
+# Required for browser-use cloud functionality
 ```
 
-## 🎯 Cách Sử Dụng
+## 🎯 Usage
 
-### 1. Sử Dụng CLI
+### 1. Using the CLI
 
 ```bash
-# Chạy basic tests
+# Run basic tests
 python weblens_cli.py run examples/basic_tests.py
 
-# Chạy tests theo tags
+# Run tests by tags
 python weblens_cli.py run examples/basic_tests.py --tags smoke navigation
 
-# Chạy tests tuần tự (không song song)
+# Run tests sequentially (no parallelism)
 python weblens_cli.py run examples/basic_tests.py --sequential
 
-# Xem danh sách profiles
+# View list of profiles
 python weblens_cli.py profiles list
 
-# Tạo profile mới
+# Create a new profile
 python weblens_cli.py profiles create
 ```
 
-### 2. Sử Dụng Programmatically
+### 2. Using Programmatically
 
 ```python
 import asyncio
 from weblens import BrowserManager, TestRunner, ProfileManager
 from weblens.core.test_runner import weblens_test
 
-# Định nghĩa test function
+# Define test function
 @weblens_test(
     name="example_test",
     description="Go to example.com, wait for the page to load, and verify the title contains 'Example'",
@@ -117,22 +117,22 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### 3. Quản Lý Browser Profiles
+### 3. Profile Management
 
 ```python
 from weblens.profiles.profile_manager import ProfileManager
 
-# Tạo profile manager
+# Create profile manager
 pm = ProfileManager()
 
-# Tạo custom profile
+# Create custom profile
 profile = pm.create_profile(
     name="my_mobile_profile",
     browser="chrome",
     user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)",
     viewport={"width": 375, "height": 812},
-    locale="vi-VN",
-    timezone="Asia/Ho_Chi_Minh"
+    locale="en-US",
+    timezone="America/New_York"
 )
 
 # Clone existing profile
@@ -148,7 +148,7 @@ for profile in profiles:
     print(f"{profile.name}: {profile.viewport}")
 ```
 
-## 📁 Cấu Trúc Dự Án
+## 📁 Project Structure
 
 ```text
 WebLens/
@@ -164,9 +164,10 @@ WebLens/
 │       ├── logger.py          # Logging utilities
 │       └── helpers.py         # Helper functions
 ├── examples/                  # Example test suites
-│   ├── basic_tests.py         # Basic test examples
-│   ├── advanced_tests.py      # Advanced test scenarios
-│   └── cloud_test.py          # Browser-use cloud examples
+│   ├── natural_language_test.py      # Basic natural language example
+│   ├── login_test_example.py         # Login testing example
+│   ├── advanced_natural_assertions.py # Advanced assertions using natural language
+│   └── direct_browser_use.py  # Direct browser-use API example
 ├── tests/                     # Framework tests
 │   ├── unit/                  # Unit tests
 │   ├── integration/           # Integration tests
@@ -185,10 +186,10 @@ WebLens/
 
 ## 🔧 Available Browser Profiles
 
-Framework cung cấp sẵn các profiles phổ biến:
+The framework provides these common profiles:
 
-- **desktop_chrome**: Desktop Chrome với viewport 1920x1080
-- **mobile_chrome**: Mobile Chrome mô phỏng iPhone
+- **desktop_chrome**: Desktop Chrome with 1920x1080 viewport
+- **mobile_chrome**: Mobile Chrome simulating iPhone
 - **tablet**: Tablet viewport 768x1024
 - **desktop_firefox**: Desktop Firefox
 - **high_dpi**: High resolution display
@@ -196,12 +197,12 @@ Framework cung cấp sẵn các profiles phổ biến:
 
 ## 📊 Test Reports
 
-WebLens tự động tạo reports chi tiết bao gồm:
+WebLens automatically generates detailed reports including:
 
-- **JSON Reports**: Kết quả chi tiết ở format JSON
-- **Screenshots**: Captures màn hình khi test fails
-- **Videos**: Recording toàn bộ test session (optional)
-- **Logs**: Detailed logging với multiple levels
+- **JSON Reports**: Detailed results in JSON format
+- **Screenshots**: Screen captures when tests fail
+- **Videos**: Recording of the entire test session (optional)
+- **Logs**: Detailed logging with multiple levels
 
 ## 🎨 Advanced Features
 
@@ -225,7 +226,7 @@ from weblens.utils.helpers import retry_async
 
 @retry_async(max_retries=3, delay=1.0)
 async def flaky_test(browser):
-    # Test sẽ được retry tối đa 3 lần nếu fail
+    # Test will be retried up to 3 times if it fails
     result = await browser.execute_natural_language("Navigate to unstable-site.com and verify it loads properly")
 ```
 
@@ -236,13 +237,13 @@ from weblens.utils.helpers import timing
 
 @timing
 async def performance_test(browser):
-    # Execution time sẽ được log tự động
+    # Execution time will be logged automatically
     result = await browser.execute_natural_language("Go to example.com and measure page load time")
 ```
 
-## 🔍 Assertions Nâng Cao
+## 🔍 Advanced Assertions
 
-WebLens cho phép kết hợp ngôn ngữ tự nhiên với các assertions phức tạp để kiểm tra tính năng và dữ liệu của trang web:
+WebLens allows combining natural language with complex assertions to test website features and data:
 
 ```python
 @weblens_test(
@@ -255,60 +256,60 @@ WebLens cho phép kết hợp ngôn ngữ tự nhiên với các assertions ph�
     )
 )
 async def test_product_price(browser):
-    """Kiểm tra và xác thực giá sản phẩm"""
+    """Check and validate product price"""
     result = await browser.run()
     
-    # Tìm giá trong kết quả bằng biểu thức chính quy
+    # Find price in the result using regex
     price_match = re.search(r'\$([0-9]+\.[0-9]+)', result)
     if price_match:
         price = float(price_match.group(1))
-        assert 20 <= price <= 50, f"Giá ${price} nằm ngoài khoảng kỳ vọng $20-$50"
+        assert 20 <= price <= 50, f"Price ${price} is outside the expected range $20-$50"
     else:
-        assert False, "Không tìm thấy thông tin giá trong kết quả"
+        assert False, "Price information not found in the result"
 ```
 
-Xem thêm ví dụ phức tạp hơn tại `examples/advanced_natural_assertions.py`.
+See more complex examples in `examples/advanced_natural_assertions.py`.
 
-## Cấu hình API Cloud
+## Cloud API Configuration
 
-WebLens sử dụng browser-use cloud API thay vì Playwright để điều khiển trình duyệt. Để tùy chỉnh:
+WebLens uses the browser-use cloud API instead of Playwright to control browsers. To customize:
 
-1. **API Key**: Đặt `BROWSER_USE_API_KEY` trong file `.env` để xác thực với dịch vụ cloud
-2. **URL Cơ sở API**: Có thể tùy chỉnh URL API bằng cách đặt biến môi trường `BROWSER_USE_BASE_URL` trong file `.env`
+1. **API Key**: Set `BROWSER_USE_API_KEY` in the `.env` file to authenticate with the cloud service
+2. **API Base URL**: You can customize the API URL by setting the `BROWSER_USE_BASE_URL` environment variable in the `.env` file
 
 ```bash
-# Trong file .env
+# In .env file
 BROWSER_USE_API_KEY=your_api_key_here
-BROWSER_USE_BASE_URL=https://api.browser-use.com/api/v1  # URL mặc định
+BROWSER_USE_BASE_URL=https://api.browser-use.com/api/v1  # default URL
 ```
 
-### Khi nào cần tùy chỉnh Base URL
+### When to customize Base URL
 
-Bạn có thể cần tùy chỉnh base URL trong các trường hợp sau:
+You may need to customize the base URL in the following cases:
 
-- Khi sử dụng phiên bản API mới hoặc đặc biệt
-- Khi kết nối tới môi trường staging hoặc testing
-- Khi dùng proxy để tối ưu hiệu suất từ các khu vực địa lý khác nhau
-- Khi triển khai self-hosted browser-use service
+- When using a new or special API version
+- When connecting to staging or testing environments
+- When using proxies to optimize performance from different geographical regions
+- When deploying a self-hosted browser-use service
 
-### Thiết lập URL và kiểm tra kết nối
+### Setting up URL and checking connection
 
 ```python
 import os
 from weblens.config import config
 
-# Kiểm tra cấu hình hiện tại
+# Check current configuration
 print(f"Base URL: {config.browser_use_base_url}")
 print(f"API Key configured: {'Yes' if config.browser_use_api_key else 'No'}")
 ```
 
 Chi tiết thêm về browser-use cloud API và các tùy chỉnh nâng cao có thể xem tại [tài liệu browser-use cloud API](./docs/browser_use_cloud_api.md).
 
-## 🗣️ Sử Dụng Natural Language
+## 🗣️ Using Natural Language
 
-WebLens hiện sử dụng phương pháp ngôn ngữ tự nhiên để điều khiển trình duyệt thay vì các phương thức selector-based truyền thống. Điều này giúp viết test case dễ dàng hơn và ít phụ thuộc vào cấu trúc HTML/CSS cụ thể của trang web.
+WebLens now uses a natural language approach to control browsers instead of traditional selector-based methods. This makes writing test cases easier and less dependent on specific HTML/CSS structure of web pages.
 
-### 1. Viết Test bằng Ngôn Ngữ Tự Nhiên
+### 1. Writing Tests in Natural Language
 
 ```python
 @weblens_test(
@@ -326,7 +327,7 @@ async def test_login(browser):
     assert "welcome message appears" in result
 ```
 
-### 2. Thêm Hướng Dẫn Trong Test
+### 2. Adding Instructions in Tests
 
 ```python
 @weblens_test(
@@ -334,10 +335,10 @@ async def test_login(browser):
     description="Go to example.com"
 )
 async def test_complex_flow(browser):
-    # Thực hiện mô tả ban đầu
+    # Execute initial description
     await browser.run()
     
-    # Thêm các bước bổ sung
+    # Add additional steps
     result1 = await browser.execute_natural_language(
         "Click on the Products link in the navigation menu"
     )
@@ -350,11 +351,11 @@ async def test_complex_flow(browser):
         "Add the product to cart and proceed to checkout"
     )
     
-    # Kiểm tra kết quả
+    # Check results
     assert "checkout page" in result3
 ```
 
-### 3. Kết Hợp Với Assertions
+### 3. Combining with Assertions
 
 ```python
 @weblens_test(
@@ -362,22 +363,22 @@ async def test_complex_flow(browser):
     description="Go to example.com and search for 'WebLens framework'"
 )
 async def test_search(browser):
-    # Thực hiện tìm kiếm
+    # Perform search
     result = await browser.run()
     
-    # Kiểm tra kết quả tìm kiếm
+    # Check search results
     search_results = await browser.execute_natural_language(
         "Count the number of search results and return the count"
     )
     
-    # Convert kết quả từ chuỗi sang số
+    # Convert result from string to number
     count = int(''.join(filter(str.isdigit, search_results)))
     assert count > 0
 ```
 
-## 🧪 Ví Dụ Test Đăng Nhập
+## 🧪 Login Test Example
 
-WebLens cung cấp một ví dụ đầy đủ về cách test chức năng đăng nhập cho một trang web thực tế:
+WebLens provides a complete example of how to test login functionality for a real website:
 
 ```python
 @weblens_test(
@@ -391,35 +392,35 @@ WebLens cung cấp một ví dụ đầy đủ về cách test chức năng đă
     tags=["login", "positive"]
 )
 async def test_successful_login(browser):
-    """Test đăng nhập thành công với thông tin hợp lệ"""
+    """Test successful login with valid credentials"""
     result = await browser.run()
     assert "login was successful" in result.lower()
 ```
 
-Để chạy ví dụ đầy đủ về test đăng nhập, sử dụng lệnh sau:
+To run the complete login testing example, use the following command:
 
 ```bash
 python examples/login_test_example.py
 ```
 
-Ví dụ này bao gồm các test cases sau:
+This example includes the following test cases:
 
-- Đăng nhập thành công với thông tin hợp lệ
-- Đăng nhập với username không hợp lệ
-- Đăng nhập với password không hợp lệ
-- Đăng nhập thành công và sau đó đăng xuất
+- Successful login with valid credentials
+- Login with an invalid username
+- Login with an invalid password
+- Successful login followed by logout
 
-Xem mã nguồn đầy đủ tại `examples/login_test_example.py`
+For the complete source code, see `examples/login_test_example.py`
 
-## 📚 Tài Liệu Bổ Sung
+## 📚 Additional Documentation
 
-Ngoài hướng dẫn này, WebLens còn cung cấp các tài liệu chuyên sâu khác:
+Besides this guide, WebLens provides other in-depth documentation:
 
-- [Comprehensive Natural Language Guide](./docs/natural_language_guide_full.md) - Hướng dẫn đầy đủ về cách tiếp cận ngôn ngữ tự nhiên
-- [Natural Language Approach](./docs/natural_language_approach.md) - Hướng dẫn chi tiết về cách sử dụng ngôn ngữ tự nhiên trong testing
-- [Login Testing Guide](./docs/login_testing_guide.md) - Hướng dẫn kiểm tra chức năng đăng nhập với WebLens
-- [Browser Use Cloud API](./docs/browser_use_cloud_api.md) - Tài liệu về API cloud được sử dụng trong WebLens
+- [Comprehensive Natural Language Guide](./docs/natural_language_guide_full.md) - Complete guide to the natural language approach
+- [Natural Language Approach](./docs/natural_language_approach.md) - Detailed guide on using natural language in testing
+- [Login Testing Guide](./docs/login_testing_guide.md) - Guide for testing login functionality with WebLens
+- [Browser Use Cloud API](./docs/browser_use_cloud_api.md) - Documentation about the cloud API used in WebLens
 
-## 📝 Những Thay Đổi Gần Đây
+## 📝 Recent Changes
 
-WebLens đã chuyển sang sử dụng hoàn toàn cách tiếp cận ngôn ngữ tự nhiên thông qua API browser-use. Để biết chi tiết về những thay đổi này, vui lòng tham khảo [tài liệu thay đổi](./docs/THAY_DOI.md).
+WebLens has transitioned to using a fully natural language approach through the browser-use API. For details about these changes, please refer to the [change log document](./docs/THAY_DOI.md).
