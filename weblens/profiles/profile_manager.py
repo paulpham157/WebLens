@@ -18,14 +18,14 @@ class ProfileSettings:
     name: str
     browser: str
     user_agent: Optional[str] = None
-    viewport: Dict[str, int] = None
+    viewport: Optional[Dict[str, int]] = None
     locale: str = "en-US"
     timezone: str = "America/New_York"
-    permissions: List[str] = None
-    cookies: List[Dict[str, Any]] = None
-    local_storage: Dict[str, str] = None
-    session_storage: Dict[str, str] = None
-    extensions: List[str] = None
+    permissions: Optional[List[str]] = None
+    cookies: Optional[List[Dict[str, Any]]] = None
+    local_storage: Optional[Dict[str, str]] = None
+    session_storage: Optional[Dict[str, str]] = None
+    extensions: Optional[List[str]] = None
     proxy: Optional[Dict[str, str]] = None
     
     def __post_init__(self):
@@ -48,7 +48,7 @@ class ProfileManager:
     
     def __init__(self):
         self.profiles: Dict[str, ProfileSettings] = {}
-        self.profiles_dir = config.profiles_dir
+        self.profiles_dir = config.browser_profiles_dir
         self._load_default_profiles()
     
     def _load_default_profiles(self):
