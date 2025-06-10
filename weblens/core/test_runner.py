@@ -20,8 +20,6 @@ logger = get_logger(__name__)
 class TestResult:
     """Test execution result"""
     name: str
-    browser: str
-    profile: Optional[str]
     status: str  # "passed", "failed", "skipped"
     duration: float
     error_message: Optional[str] = None
@@ -35,8 +33,6 @@ class TestCase:
     name: str
     description: str
     test_function: Callable
-    browsers: List[str] = field(default_factory=lambda: ["browser_use_cloud"])
-    profiles: List[str] = field(default_factory=list)
     tags: List[str] = field(default_factory=list)
 
 
@@ -58,8 +54,6 @@ class TestRunner:
             name=name,
             description=description,
             test_function=test_function,
-            browsers=["browser_use_cloud"],  # Fixed value for cloud
-            profiles=[],  # Not used in cloud mode
             tags=tags or []
         )
         self.test_cases.append(test_case)
@@ -88,8 +82,6 @@ class TestRunner:
             duration = time.time() - start_time
             result = TestResult(
                 name=test_name,
-                browser="browser_use_cloud",
-                profile=None,
                 status="passed",
                 duration=duration
             )
@@ -102,8 +94,6 @@ class TestRunner:
             
             result = TestResult(
                 name=test_name,
-                browser="browser_use_cloud",
-                profile=None,
                 status="failed",
                 duration=duration,
                 error_message=error_message
@@ -222,8 +212,6 @@ class TestRunner:
             "results": [
                 {
                     "name": r.name,
-                    "browser": r.browser,
-                    "profile": r.profile,
                     "status": r.status,
                     "duration": r.duration,
                     "error_message": r.error_message,
@@ -252,13 +240,13 @@ class TestRunner:
 def weblens_test(name: str, 
                 description: str = "",
                 tags: Optional[List[str]] = None):
-    """Decorator to register test functions"""
+    """Decorator to register test functions using natural language approach"""
     def decorator(func):
-        # This would typically be registered with a global test runner instance
+        # Store test info as attributes of the function
         func._weblens_test_info = {
             "name": name,
             "description": description,
-            "tags": tags
+            "tags": tags or []
         }
         return func
     return decorator

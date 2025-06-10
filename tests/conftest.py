@@ -68,18 +68,12 @@ def temp_config_dir(tmp_path):
 
 @pytest.fixture
 def mock_browser():
-    """Create a mock browser for testing"""
+    """Create a mock browser for testing using natural language approach"""
     from unittest.mock import AsyncMock
     
     browser = AsyncMock()
-    browser.go_to = AsyncMock()
-    browser.get_title = AsyncMock(return_value="Test Page")
-    browser.find_element = AsyncMock()
-    browser.find_elements = AsyncMock(return_value=[])
-    browser.click = AsyncMock()
-    browser.fill_input = AsyncMock()
-    browser.get_text = AsyncMock(return_value="Test content")
-    browser.take_screenshot = AsyncMock()
-    browser.close = AsyncMock()
+    browser.run = AsyncMock(return_value="Mock result")
+    browser.execute_natural_language = AsyncMock(return_value="Mock natural language result")
+    browser.take_screenshot = AsyncMock(return_value="/path/to/screenshot.png")
     
     return browser

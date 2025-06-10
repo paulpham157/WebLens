@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # WebLens Quick Start with Conda
-# This script quickly sets up and runs WebLens
+# This script quickly sets up and runs WebLens with natural language testing
 
 set -e
 
-echo "🚀 WebLens Quick Start"
-echo "====================="
+echo "🚀 WebLens Quick Start - Natural Language Browser Testing"
+echo "======================================================"
+echo "WebLens now uses natural language to control browsers!"
 
 # Check if conda is available
 if ! command -v conda &> /dev/null; then
@@ -34,9 +35,9 @@ fi
 # Browser Use Cloud API doesn't need local browser installation
 echo "🌐 Using Browser Use Cloud API - no local browser installation needed"
 
-# Create .env file if needed
+# Check for API key
 if [ ! -f .env ]; then
-    echo "⚙️  Creating .env file..."
+    echo "📝 Creating .env file for your API key"
     cp .env.example .env
     echo "📝 Please edit .env file and add your Browser-use API key"
 fi
@@ -45,15 +46,20 @@ fi
 mkdir -p logs screenshots videos reports browser_profiles
 
 echo
-echo "🎉 WebLens is ready!"
-echo "==================="
+echo "🎉 WebLens is ready with Natural Language Testing!"
+echo "=============================================="
 echo
 echo "Quick commands to try:"
-echo "• List profiles: python weblens_cli.py profiles list"
-echo "• Run basic tests: python weblens_cli.py run examples/basic_tests.py"
+echo "• Run natural language test: python examples/natural_language_test.py"
+echo "• Test login functionality: python examples/login_test_example.py"
+echo "• Run all examples: ./run_examples.sh"
 echo "• Get help: python weblens_cli.py --help"
+echo
+echo "📚 Documentation:"
+echo "• Natural Language Guide: docs/natural_language_guide_full.md"
+echo "• Login Testing Guide: docs/login_testing_guide.md"
 echo
 echo "Environment: $CONDA_DEFAULT_ENV"
 echo "Python: $(python --version)"
 echo
-echo "Happy testing! 🚀"
+echo "Happy testing with natural language! 🚀"

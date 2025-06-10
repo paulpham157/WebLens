@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Very basic test
+Very basic test with natural language
 """
 import asyncio
 import sys
@@ -13,6 +13,9 @@ try:
     
     async def test_func(agent):
         print("Test function called")
+        # Using natural language approach
+        result = await agent.execute_natural_language("Check if the test setup is working correctly")
+        print(f"Natural language result: {result}")
         return True
     
     async def main():
@@ -21,7 +24,11 @@ try:
         print("Runner created")
         
         print("Registering test...")
-        runner.register_test("test", "description", test_func)
+        runner.register_test(
+            name="debug_test", 
+            description="Simple test to verify framework using natural language", 
+            test_function=test_func
+        )
         print("Test registered")
         
         print("Running tests...")

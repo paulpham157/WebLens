@@ -57,15 +57,14 @@ class TestTestRunner:
             name="test1",
             description="Test description",
             test_function=dummy_test,
-            tags=["smoke"])
+            tags=["smoke"]
         )
         
         assert len(runner.test_cases) == 1
         test_case = runner.test_cases[0]
         assert test_case.name == "test1"
         assert test_case.description == "Test description"
-        assert test_case.browsers == ["chrome"]
-        assert test_case.profiles == ["desktop"]
+        assert test_case.tags == ["smoke"]
     
     def test_filter_tests(self):
         """Test test filtering"""
@@ -78,18 +77,23 @@ class TestTestRunner:
             pass
         
         # Register tests
-        runner.register_test("test1", "Description 1", test1, ["chrome"], ["desktop"], ["smoke"])
-        runner.register_test("test2", "Description 2", test2, ["firefox"], ["mobile"], ["regression"])
-        
-        # Test filtering by browser
-        filtered = runner._filter_tests(browsers=["chrome"])
-        assert len(filtered) == 1
-        assert filtered[0][1] == "chrome"
+        runner.register_test(
+            name="test1", 
+            description="Description 1", 
+            test_function=test1,
+            tags=["smoke"]
+        )
+        runner.register_test(
+            name="test2", 
+            description="Description 2", 
+            test_function=test2,
+            tags=["regression"]
+        )
         
         # Test filtering by tags
         filtered = runner._filter_tests(tags=["smoke"])
         assert len(filtered) == 1
-        assert filtered[0][0].name == "test1"
+        assert filtered[0].name == "test1"
 
 
 class TestProfileManager:
@@ -183,32 +187,17 @@ class TestConfig:
         assert config.screenshots_dir.exists()
         assert config.videos_dir.exists()
         assert config.reports_dir.exists()
-        assert config.profiles_dir.exists()
     
-    def test_browser_configs(self):
-        """Test browser configurations"""
+    def test_config_values(self):
+        """Test config values"""
         config = Config()
-        browser_configs = config.browser_configs
         
-        assert "chrome" in browser_configs
-        assert "firefox" in browser_configs
-        assert "safari" in browser_configs
-        assert "edge" in browser_configs
-        
-        chrome_config = browser_configs["chrome"]
-        assert chrome_config.name == "chrome"
-        assert isinstance(chrome_config.timeout, int)
-        assert isinstance(chrome_config.headless, bool)
-    
-    def test_test_config(self):
-        """Test test configuration"""
-        config = Config()
-        test_config = config.test_config
-        
-        assert isinstance(test_config.base_url, str)
-        assert isinstance(test_config.parallel_workers, int)
-        assert isinstance(test_config.timeout, int)
-        assert isinstance(test_config.screenshot_on_failure, bool)
+        # Basic properties should be present
+        assert hasattr(config, "api_key")
+        assert hasattr(config, "base_url")
+        assert hasattr(config, "timeout")
+        assert hasattr(config, "screenshot_on_failure")
+        assert hasattr(config, "parallel_workers")
 
 
 class TestProfileSettings:
@@ -249,15 +238,11 @@ class TestTestResult:
         """Test test result creation"""
         result = TestResult(
             name="test_example",
-            browser="chrome",
-            profile="desktop",
             status="passed",
             duration=1.5
         )
         
         assert result.name == "test_example"
-        assert result.browser == "chrome"
-        assert result.profile == "desktop"
         assert result.status == "passed"
         assert result.duration == 1.5
         assert result.error_message is None
@@ -276,16 +261,12 @@ class TestTestCase:
             name="test_example",
             description="Example test",
             test_function=dummy_test,
-            browsers=["chrome", "firefox"],
-            profiles=["desktop", "mobile"],
             tags=["smoke", "regression"]
         )
         
         assert test_case.name == "test_example"
         assert test_case.description == "Example test"
         assert test_case.test_function == dummy_test
-        assert test_case.browsers == ["chrome", "firefox"]
-        assert test_case.profiles == ["desktop", "mobile"]
         assert test_case.tags == ["smoke", "regression"]
 
 
