@@ -57,30 +57,30 @@ import json
 import time
 import requests
 
-API_KEY = 'your_api_key_here'
-BASE_URL = 'https://api.browser-use.com/api/v1'
-HEADERS = {'Authorization': f'Bearer {API_KEY}'}
+BROWSER_USE_API_KEY = 'your_api_key_here'
+BROWSER_USE_BASE_URL = 'https://api.browser-use.com/api/v1'
+HEADERS = {'Authorization': f'Bearer {BROWSER_USE_API_KEY}'}
 
 
-def create_task(instructions: str):
+def create_task(instructions: str) -> str:
     """Create a new browser automation task"""
-    response = requests.post(f'{BASE_URL}/run-task', headers=HEADERS, json={'task': instructions})
+    response = requests.post(f'{BROWSER_USE_BASE_URL}/run-task', headers=HEADERS, json={'task': instructions})
     return response.json()['id']
 
 
-def get_task_status(task_id: str):
+def get_task_status(task_id: str) -> Dict[str, Any]:
     """Get current task status"""
-    response = requests.get(f'{BASE_URL}/task/{task_id}/status', headers=HEADERS)
+    response = requests.get(f'{BROWSER_USE_BASE_URL}/task/{task_id}/status', headers=HEADERS)
     return response.json()
 
 
-def get_task_details(task_id: str):
+def get_task_details(task_id: str) -> Dict[str, Any]:
     """Get full task details including output"""
-    response = requests.get(f'{BASE_URL}/task/{task_id}', headers=HEADERS)
+    response = requests.get(f'{BROWSER_USE_BASE_URL}/task/{task_id}', headers=HEADERS)
     return response.json()
 
 
-def wait_for_completion(task_id: str, poll_interval: int = 2):
+def wait_for_completion(task_id: str, poll_interval: int = 2) -> Dict[str, Any]:
     """Poll task status until completion"""
     count = 0
     unique_steps = []
@@ -101,7 +101,7 @@ def wait_for_completion(task_id: str, poll_interval: int = 2):
         time.sleep(poll_interval)
 
 
-def main():
+def main() -> None:
     task_id = create_task('Open https://www.google.com and search for openai')
     print(f'Task created with ID: {task_id}')
     task_details = wait_for_completion(task_id)
@@ -125,14 +125,14 @@ def control_task():
     time.sleep(5)
 
     # Pause the task
-    requests.put(f"{BASE_URL}/pause-task?task_id={task_id}", headers=HEADERS)
+    requests.put(f"{BROWSER_USE_BASE_URL}/pause-task?task_id={task_id}", headers=HEADERS)
     print("Task paused! Check the live preview.")
 
     # Wait for user input
     input("Press Enter to resume...")
 
     # Resume the task
-    requests.put(f"{BASE_URL}/resume-task?task_id={task_id}", headers=HEADERS)
+    requests.put(f"{BROWSER_USE_BASE_URL}/resume-task?task_id={task_id}", headers=HEADERS)
 
     # Wait for completion
     result = wait_for_completion(task_id)
@@ -144,18 +144,19 @@ def control_task():
 Sử dụng Pydantic để định nghĩa cấu trúc output:
 
 ```python
-import json
-import os
-import time
-import requests
-from pydantic import BaseModel
-from typing import List
+import json  
+import os  
+import time  
+from typing import List  
+
+import requests  
+from pydantic import BaseModel 
 
 
-API_KEY = os.getenv("API_KEY")
-BASE_URL = 'https://api.browser-use.com/api/v1'
+BROWSER_USE_API_KEY = os.getenv("BROWSER_USE_API_KEY")
+BROWSER_USE_BASE_URL = 'https://api.browser-use.com/api/v1'
 HEADERS = {
-    "Authorization": f"Bearer {API_KEY}",
+    "Authorization": f"Bearer {BROWSER_USE_API_KEY}",
     "Content-Type": "application/json"
 }
 
@@ -172,21 +173,21 @@ class SocialMediaCompanies(BaseModel):
     companies: List[SocialMediaCompany]
 
 
-def create_structured_task(instructions: str, schema: dict):
+def create_structured_task(instructions: str, schema: dict) -> Dict[str, Any]:
     """Create a task that expects structured output"""
     payload = {
         "task": instructions,
         "structured_output_json": json.dumps(schema)
     }
-    response = requests.post(f"{BASE_URL}/run-task", headers=HEADERS, json=payload)
+    response = requests.post(f"{BROWSER_USE_BASE_URL}/run-task", headers=HEADERS, json=payload)
     response.raise_for_status()
     return response.json()["id"]
 
 
-def wait_for_task_completion(task_id: str, poll_interval: int = 5):
+def wait_for_task_completion(task_id: str, poll_interval: int = 5) -> None:
     """Poll task status until it completes"""
     while True:
-        response = requests.get(f"{BASE_URL}/task/{task_id}/status", headers=HEADERS)
+        response = requests.get(f"{BROWSER_USE_BASE_URL}/task/{task_id}/status", headers=HEADERS)
         response.raise_for_status()
         status = response.json()
         if status == "finished":
@@ -197,9 +198,9 @@ def wait_for_task_completion(task_id: str, poll_interval: int = 5):
         time.sleep(poll_interval)
 
 
-def fetch_task_output(task_id: str):
+def fetch_task_output(task_id: str) -> Any:
     """Retrieve the final task result"""
-    response = requests.get(f"{BASE_URL}/task/{task_id}", headers=HEADERS)
+    response = requests.get(f"{BROWSER_USE_BASE_URL}/task/{task_id}", headers=HEADERS)
     response.raise_for_status()
     return response.json()["output"]
 
@@ -231,25 +232,28 @@ def main():
 Bạn có thể thiết lập webhooks để nhận thông báo về các sự kiện trong tác vụ của mình. Dưới đây là một ví dụ về cách xử lý webhooks với FastAPI:
 
 ```python
-import uvicorn
-import hmac
-import hashlib
-import json
-import os
+import hashlib  
+import hmac  
+import json  
+import os  
 
-from fastapi import FastAPI, Request, HTTPException
+import uvicorn  
+from fastapi import FastAPI, Request, HTTPException  
 
 app = FastAPI()
 
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.getenv['SECRET_KEY']
+if SECRET_KEY is None:  
+    raise ValueError("The SECRET_KEY environment variable has not been set.")  
 
-def verify_signature(payload: dict, timestamp: str, received_signature: str) -> bool:
+
+def verify_signature(payload: Dict[str, Any], timestamp: str, received_signature: str) -> bool:
     message = f'{timestamp}.{json.dumps(payload, separators=(",", ":"), sort_keys=True)}'
     expected_signature = hmac.new(SECRET_KEY.encode(), message.encode(), hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected_signature, received_signature)
 
 @app.post('/webhook')
-async def webhook(request: Request):
+async def webhook(request: Request) -> Dict[str, str]:
     body = await request.json()
 
     timestamp = request.headers.get('X-Browser-Use-Timestamp')
@@ -339,7 +343,10 @@ from weblens.utils.logger import setup_logger
 logger = setup_logger(__name__)
 
 class BrowserManager:
-    def __init__(self, api_key: str, base_url: str = "https://api.browser-use.com/api/v1"):
+    """
+    BrowserManager
+    """
+    def __init__(self, api_key: str, base_url: str = "https://api.browser-use.com/api/v1") -> None:
         self.api_key = api_key
         self.base_url = base_url
         self.headers = {
@@ -376,7 +383,7 @@ class BrowserManager:
             logger.error(f"Failed to create task: {str(e)}")
             raise
     
-    def get_task_status(self, task_id: str) -> str:
+    def get_task_status(self, task_id: str) -> Dict[str, Any]:
         """Get the current status of a task"""
         try:
             response = requests.get(f"{self.base_url}/task/{task_id}/status", headers=self.headers)
