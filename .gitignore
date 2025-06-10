@@ -49,6 +49,16 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+
+# WebLens specific
+.env
+logs/
+browser_profiles/
+screenshots/
+videos/
+reports/
+temp/
+tmp/
 cover/
 
 # Translations
