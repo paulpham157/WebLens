@@ -35,6 +35,7 @@ class Config:
         
         # Browser-use Cloud API settings
         self.browser_use_api_key = os.getenv("BROWSER_USE_API_KEY", "")
+        self.browser_use_base_url = os.getenv("BROWSER_USE_BASE_URL", "https://api.browser-use.com/api/v1")
         
         # Test settings
         self.test_base_url = os.getenv("TEST_BASE_URL", "https://example.com")
@@ -52,6 +53,7 @@ class Config:
         
         return {
             "api_key": self.browser_use_api_key,
+            "base_url": self.browser_use_base_url,
             "timeout": self.test_timeout,
             "max_workers": self.test_parallel_workers
         }
@@ -59,6 +61,8 @@ class Config:
     def validate_config(self) -> bool:
         """Validate configuration"""
         if not self.browser_use_api_key:
+            return False
+        if not self.browser_use_base_url:
             return False
         return True
 

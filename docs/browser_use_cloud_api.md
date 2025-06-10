@@ -8,6 +8,9 @@ Tài liệu này tổng hợp thông tin quan trọng từ [tài liệu chính t
 
 - [Giới thiệu](#giới-thiệu)
 - [Cài đặt](#cài-đặt)
+- [Cấu hình API](#cấu-hình-api)
+  - [Thiết lập API Key](#thiết-lập-api-key)
+  - [Tùy chỉnh Base URL](#tùy-chỉnh-base-url)
 - [Các API endpoints chính](#các-api-endpoints-chính)
 - [Triển khai cơ bản](#triển-khai-cơ-bản)
 - [Kiểm soát tác vụ](#kiểm-soát-tác-vụ)
@@ -15,6 +18,7 @@ Tài liệu này tổng hợp thông tin quan trọng từ [tài liệu chính t
 - [Webhooks](#webhooks)
 - [Các best practices](#các-best-practices)
 - [Ví dụ tích hợp với WebLens](#ví-dụ-tích-hợp-với-weblens)
+  - [Best Practices khi tùy chỉnh Base URL](#best-practices-khi-tùy-chỉnh-base-url)
 
 ## Giới thiệu
 
@@ -34,6 +38,36 @@ WebLens đã loại bỏ Playwright và chỉ sử dụng `browser-use` package.
 ```bash
 pip install browser-use>=0.2.0
 ```
+
+## Cấu hình API
+
+### Thiết lập API Key
+
+WebLens yêu cầu API key để kết nối với Browser Use Cloud API. Bạn có thể đặt API key trong tệp cấu hình `.env`:
+
+```bash
+# Trong tệp .env
+BROWSER_USE_API_KEY=your_api_key_here
+```
+
+### Tùy chỉnh Base URL
+
+Mặc định, WebLens sử dụng base URL của Browser Use Cloud API chính thức: `https://api.browser-use.com/api/v1`. 
+Tuy nhiên, trong một số trường hợp bạn có thể cần tùy chỉnh base URL này, ví dụ:
+
+- Sử dụng phiên bản API mới
+- Kết nối tới instance Browser Use riêng
+- Sử dụng proxy để tối ưu hóa kết nối ở các khu vực địa lý khác nhau
+
+Để tùy chỉnh base URL, hãy đặt biến môi trường `BROWSER_USE_BASE_URL` trong tệp `.env`:
+
+```bash
+# Trong tệp .env
+BROWSER_USE_API_KEY=your_api_key_here
+BROWSER_USE_BASE_URL=https://your-custom-api-endpoint.com/api/v1
+```
+
+WebLens sẽ tự động sử dụng base URL tùy chỉnh khi khởi tạo các agent.
 
 ## Các API endpoints chính
 
@@ -318,12 +352,13 @@ Các trạng thái tác vụ trong webhook:
 ## Các best practices
 
 1. **Xử lý API key an toàn**: Sử dụng environment variables hoặc secret management system thay vì hardcoding API keys.
-2. **Xử lý lỗi**: Luôn cài đặt xử lý lỗi đầy đủ cho các API calls.
-3. **Sử dụng Structured Output**: Khi cần dữ liệu có cấu trúc rõ ràng, hãy sử dụng Structured Output với schema Pydantic.
-4. **Giới hạn domain**: Thiết lập `allowed_domains` để tăng tính bảo mật.
-5. **Sử dụng proxy**: Bật tùy chọn `use_proxy` khi cần giải quyết captchas.
-6. **Kiểm tra trạng thái**: Kiểm tra trạng thái tác vụ thường xuyên và xử lý từng trường hợp cụ thể.
-7. **Xác minh webhook signatures**: Luôn xác minh chữ ký webhooks trước khi xử lý payload.
+2. **Tùy chỉnh URL cơ sở**: Sử dụng biến môi trường `BROWSER_USE_BASE_URL` để tùy chỉnh endpoint API, ví dụ khi cần sử dụng proxy, server riêng, hoặc môi trường staging.
+3. **Xử lý lỗi**: Luôn cài đặt xử lý lỗi đầy đủ cho các API calls.
+4. **Sử dụng Structured Output**: Khi cần dữ liệu có cấu trúc rõ ràng, hãy sử dụng Structured Output với schema Pydantic.
+5. **Giới hạn domain**: Thiết lập `allowed_domains` để tăng tính bảo mật.
+6. **Sử dụng proxy**: Bật tùy chọn `use_proxy` khi cần giải quyết captchas.
+7. **Kiểm tra trạng thái**: Kiểm tra trạng thái tác vụ thường xuyên và xử lý từng trường hợp cụ thể.
+8. **Xác minh webhook signatures**: Luôn xác minh chữ ký webhooks trước khi xử lý payload.
 
 ## Ví dụ tích hợp với WebLens
 
@@ -485,20 +520,64 @@ Sử dụng ví dụ:
 
 import os
 from weblens.core.browser_manager import BrowserManager
+from weblens.config import config
 
-# Lấy API key từ environment variable
-api_key = os.getenv("BROWSER_USE_API_KEY")
-browser_manager = BrowserManager(api_key=api_key)
+# Các biến môi trường đã được đọc tự động từ config.py
+# Cấu hình Browser Use API trong file .env
+# BROWSER_USE_API_KEY='your_api_key_here'
+# BROWSER_USE_BASE_URL='https://api.browser-use.com/api/v1'  # Mặc định hoặc URL tùy chỉnh
 
-# Tạo task mới
-task_id = browser_manager.create_task(
-    instructions="Go to https://example.com and extract all heading text",
-    allowed_domains=["example.com"]
+# BrowserManager sẽ sử dụng cấu hình từ config instance, bao gồm base_url nếu được đặt
+browser_manager = BrowserManager()
+await browser_manager.start()
+
+# Tạo agent mới với tác vụ cụ thể
+# Agent sẽ được tạo với base_url và api_key từ config
+agent = await browser_manager.create_agent(
+    task="Go to https://example.com and extract all heading text"
 )
 
-# Đợi task hoàn thành và lấy kết quả
-result = browser_manager.wait_for_completion(task_id)
-print(f"Output: {result['output']}")
+# Chạy agent và lấy kết quả
+result = await agent.run()
+print(f"Output: {result}")
+
+# Dọn dẹp tài nguyên khi hoàn thành
+await browser_manager.stop()
 ```
+
+### Best Practices khi tùy chỉnh Base URL
+
+1. **Kiểm tra kết nối**: Luôn kiểm tra kết nối trước khi triển khai:
+   ```python
+   import requests
+   
+   def test_connection(base_url, api_key):
+       headers = {'Authorization': f'Bearer {api_key}'}
+       try:
+           response = requests.get(f"{base_url}/ping", headers=headers)
+           return response.status_code == 200
+       except Exception as e:
+           print(f"Connection error: {e}")
+           return False
+   ```
+
+2. **Xử lý failover**: Chuẩn bị cơ chế failover trong trường hợp URL tùy chỉnh không hoạt động:
+   ```python
+   # Trong config.py hoặc module xử lý lỗi
+   def get_reliable_base_url():
+       custom_url = os.getenv("BROWSER_USE_BASE_URL") 
+       if custom_url and test_connection(custom_url, api_key):
+           return custom_url
+       return "https://api.browser-use.com/api/v1"  # Fallback to default
+   ```
+
+3. **Quản lý môi trường**: Sử dụng các base URL khác nhau cho các môi trường phát triển, kiểm thử và sản xuất:
+   ```bash
+   # .env.dev
+   BROWSER_USE_BASE_URL=https://dev-api.browser-use.com/api/v1
+   
+   # .env.prod
+   BROWSER_USE_BASE_URL=https://api.browser-use.com/api/v1
+   ```
 
 Đây là một ví dụ tích hợp cơ bản, trong môi trường thực tế, bạn cần thêm xử lý lỗi, retry logic, và khả năng cấu hình nâng cao hơn.

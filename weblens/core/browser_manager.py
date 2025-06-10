@@ -84,7 +84,8 @@ class BrowserManager:
             browser_config = config.get_browser_use_config()
             agent = Agent(
                 task=task,
-                api_key=browser_config["api_key"]
+                api_key=browser_config["api_key"],
+                base_url=browser_config["base_url"]
             )
         else:
             # Create mock agent for development
