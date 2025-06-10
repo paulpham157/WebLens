@@ -31,14 +31,8 @@ else
     conda activate weblens
 fi
 
-# Install Playwright browsers if needed
-echo "🌐 Checking Playwright browsers..."
-if ! playwright install --dry-run &> /dev/null; then
-    echo "📥 Installing Playwright browsers..."
-    playwright install
-else
-    echo "✅ Playwright browsers already installed"
-fi
+# Browser Use Cloud API doesn't need local browser installation
+echo "🌐 Using Browser Use Cloud API - no local browser installation needed"
 
 # Create .env file if needed
 if [ ! -f .env ]; then

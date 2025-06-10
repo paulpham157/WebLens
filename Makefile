@@ -8,7 +8,7 @@ help:
 	@echo "Available commands:"
 	@echo "  install      - Install conda environment"
 	@echo "  install-dev  - Install development dependencies"
-	@echo "  setup        - Setup project (install + playwright)"
+	@echo "  setup        - Setup project"
 	@echo "  test         - Run all tests"
 	@echo "  test-unit    - Run unit tests only"
 	@echo "  test-integration - Run integration tests"
@@ -38,7 +38,6 @@ setup:
 		echo "   If environment doesn't exist, run: conda env create -f environment.yml"; \
 		exit 1; \
 	fi
-	playwright install
 	@echo "✅ WebLens setup complete!"
 	@echo "📝 Don't forget to configure your .env file"
 
@@ -126,6 +125,5 @@ check-env:
 	@echo "🔍 Environment Check"
 	@echo "==================="
 	@python --version
-	@playwright --version 2>/dev/null || echo "❌ Playwright not installed"
 	@echo "Python packages:"
-	@pip list | grep -E "(browser-use|playwright|pytest)"
+	@pip list | grep -E "(browser-use|pytest)"

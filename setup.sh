@@ -103,14 +103,7 @@ else
     exit 1
 fi
 
-# Install Playwright browsers
-print_status "Installing Playwright browsers..."
-if playwright install; then
-    print_success "Playwright browsers installed"
-else
-    print_error "Failed to install Playwright browsers"
-    exit 1
-fi
+# Browser Use Cloud API doesn't need local browser installation
 
 # Create .env file if it doesn't exist
 if [ ! -f .env ]; then

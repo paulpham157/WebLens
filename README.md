@@ -48,11 +48,8 @@ conda create -n weblens python=3.9
 conda activate weblens
 
 # Cài đặt dependencies
-conda install -c conda-forge playwright pydantic colorama rich pytest pytest-asyncio python-dotenv black flake8 mypy
-pip install browser-use asyncio-throttle
-
-# Cài đặt Playwright browsers
-playwright install
+conda install -c conda-forge pydantic colorama rich pytest pytest-asyncio python-dotenv black flake8 mypy
+pip install browser-use>=0.2.0 asyncio-throttle
 ```
 
 ### Cấu Hình Environment
