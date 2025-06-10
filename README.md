@@ -1,6 +1,26 @@
-# WebLens - AI-Driven Automated Testing Framework
+# WebLens - AI-Driven Automated Testing Framework with Natural Language
 
 ![WebLens](https://via.placeholder.com/800x200?text=WebLens+Testing+Framework) *(Demo image)*
+
+## 🚀 Natural Language Testing
+
+WebLens fully embraces browser-use's natural language capabilities! Instead of writing programmatic test steps, you simply describe what you want the test to do:
+
+```python
+@weblens_test(
+    name="user_login_test",
+    description=(
+        "Go to example.com/login, enter username 'testuser' "
+        "and password 'password123', click the login button, "
+        "and verify login was successful"
+    )
+)
+async def test_user_login(browser):
+    result = await browser.run()  # Execute the natural language instructions
+    assert "login successful" in result.lower()
+```
+
+[Read more about the natural language approach](docs/natural_language_approach.md)
 
 ## 🔍 The Problem with Traditional Testing Frameworks
 
@@ -13,28 +33,20 @@ In software development, writing and maintaining automated tests has always been
 - **Time Consuming**: QA engineers spend most of their time writing code rather than focusing on test strategies
 - **Technical Expertise Required**: Test writers need programming knowledge to write and maintain scripts
 
-**Traditional testing forces you to write detailed code for each test step:**
+**With WebLens, all of this becomes a simple natural language instruction:**
 
 ```python
-# Traditional approach with Selenium or similar frameworks
-async def test_user_login(page):
-    # Navigate to website
-    await page.goto("https://example.com/login")
-    
-    # Fill in login form
-    await page.fill("#username", "testuser")
-    await page.fill("#password", "password123")
-    
-    # Click login button
-    await page.click("button[type=submit]")
-    
-    # Check login was successful
-    await page.wait_for_selector(".dashboard-welcome")
-    assert await page.is_visible(".user-profile")
-    
-    # Check username is displayed
-    user_name = await page.text_content(".username")
-    assert user_name == "Test User"
+@weblens_test(
+    name="user_login_test",
+    description=(
+        "Go to example.com/login, login with username 'testuser' "
+        "and password 'password123', wait for the dashboard to appear, "
+        "and verify that the username 'Test User' is displayed in the profile"
+    )
+)
+async def test_user_login(browser):
+    result = await browser.run()
+    assert "username 'Test User' is displayed" in result
 ```
 
 ## 💡 Introducing WebLens - The AI-Powered Solution
@@ -47,24 +59,6 @@ WebLens is a modern testing framework leveraging AI through the browser-use clou
 - **Easy Maintenance**: Simply adjust natural language descriptions instead of code
 - **High Speed**: Leverage cloud infrastructure to run tests in parallel
 - **No Complex Setup**: No need to install browsers or WebDrivers
-
-**With WebLens, testing becomes intuitive and efficient:**
-
-```python
-# WebLens approach using natural language
-@weblens_test(
-    name="User Login Test", 
-    description="Verify user can login successfully"
-)
-async def test_user_login(agent):
-    await agent.run("""
-    1. Open the login page of example.com
-    2. Enter username 'testuser' and password 'password123'
-    3. Click the login button
-    4. Ensure login was successful by checking we're on the dashboard
-    5. Verify the displayed username is "Test User"
-    """)
-```
 
 ## 🔄 WebLens vs. Traditional Testing Frameworks
 
@@ -82,7 +76,6 @@ async def test_user_login(agent):
 
 - **AI-Driven Testing**: Use AI to control browsers based on natural language descriptions
 - **Cloud-Based Execution**: Test on the cloud through browser-use API
-- **Multi-Profile Support**: Automatically test across different device configurations
 - **Rich Reporting**: Detailed reports with screenshots and videos
 - **Visual Verification**: Ability to recognize and interact with UI without hard-coded selectors
 - **Parallel Execution**: Run tests simultaneously on the cloud for increased performance
@@ -104,16 +97,25 @@ For detailed installation and usage instructions, see [INSTRUCTION.md](./INSTRUC
 ## 📖 Documentation
 
 - [Usage Guide](./INSTRUCTION.md) - Detailed instructions for installation and using WebLens
+- [Natural Language Approach](./docs/natural_language_approach.md) - Guide to using natural language testing
 - [Browser Use Cloud API](./docs/browser_use_cloud_api.md) - Documentation about the API used in WebLens
 - [Contributing Guide](./CONTRIBUTING.md) - Guidelines for contributing to the project
+- [Change Log](./docs/THAY_DOI.md) - Details about recent changes to direct natural language approach
 
 ## 🏗️ Project Structure
 
 ```text
 WebLens/
 ├── weblens/                   # Main source code
+│   ├── core/                  # Core framework components
+│   ├── utils/                 # Utility functions
+│   └── profiles/              # Browser profile management
 ├── docs/                      # Documentation
+│   └── natural_language_approach.md  # Guide to natural language testing
 ├── examples/                  # Usage examples
+│   ├── natural_language_test.py      # Basic natural language example
+│   ├── advanced_natural_language_test.py  # Advanced natural language example
+│   └── direct_browser_use.py  # Direct browser-use API example
 ├── tests/                     # Framework tests
 ├── INSTRUCTION.md             # Detailed instructions
 └── README.md                  # Project introduction
@@ -137,39 +139,6 @@ We welcome contributions from the community! See [CONTRIBUTING.md](./CONTRIBUTIN
 ## 📄 License
 
 WebLens is released under the [MIT License](./LICENSE).
-
----
-
-**WebLens** - Making web testing intelligent and efficient! 🚀
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-## 🙋‍♂️ Support
-
-Nếu bạn gặp vấn đề hoặc có câu hỏi:
-
-1. Check [Issues](../../issues) existing
-2. Create new issue với detailed description
-3. Contact maintainers
-
-## 🗺️ Roadmap
-
-- [ ] Visual regression testing
-- [ ] API testing integration
-- [ ] Mobile app testing support
-- [x] Cloud browser support (đã hoàn thành)
-- [ ] CI/CD integration templates
-- [ ] Performance monitoring
-- [ ] Test data management
-- [ ] Advanced reporting dashboard
 
 ---
 

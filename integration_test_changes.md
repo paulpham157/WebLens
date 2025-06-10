@@ -1,29 +1,15 @@
 # Thay Đổi Cần Thiết Cho Test Integration
 
-Sau khi loại bỏ các phương thức selector-based không còn sử dụng, các test integration cần được cập nhật để sử dụng cách tiếp cận ngôn ngữ tự nhiên. Dưới đây là danh sách các thay đổi cần thực hiện:
+Các test integration cần được cập nhật để sử dụng cách tiếp cận ngôn ngữ tự nhiên. Dưới đây là danh sách các thay đổi cần thực hiện:
 
 ## File: tests/integration/test_integration.py
 
 ### 1. Phương thức `test_browser_launch_and_navigation`
 
-Thay:
-```python
-# Launch browser
-browser = await manager.launch_browser("chrome")
-assert browser is not None
-
-# Navigate to a page
-await browser.go_to("https://example.com")
-
-# Get page title
-title = await browser.get_title()
-assert "Example" in title
-```
-
-Bằng:
+Chuyển đổi thành:
 ```python
 # Create agent
-agent = await manager.create_agent("Go to example.com and check the title", "test_agent")
+agent = await manager.create_agent("Điều hướng đến example.com và kiểm tra tiêu đề", "test_agent")
 assert agent is not None
 
 # Run natural language task
@@ -33,22 +19,15 @@ assert result
 
 ### 2. Phương thức `test_profile_based_testing`
 
-Thay:
-```python
-# Launch browser with profile
-browser = await manager.launch_browser("chrome", profile_name)
-assert browser is not None
-
-# Test navigation
-await browser.go_to("https://httpbin.org/user-agent")
-
-# Close browser
-await manager.close_browser("chrome", profile_name)
-```
-
-Bằng:
+Chuyển đổi thành:
 ```python
 # Create agent with task
+agent = await manager.create_agent("Truy cập https://httpbin.org/user-agent và kiểm tra thông tin user-agent", "test_profile_agent")
+assert agent is not None
+
+# Run task
+result = await agent.run()
+assert result
 agent = await manager.create_agent(f"Go to https://httpbin.org/user-agent", "test_agent")
 assert agent is not None
 

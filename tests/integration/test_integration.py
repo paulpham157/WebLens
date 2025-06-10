@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 from weblens import BrowserManager, TestRunner, ProfileManager
+from weblens.core.test_runner import weblens_test
 from weblens.config import config
 
 
@@ -22,19 +23,13 @@ class TestIntegration:
         try:
             await manager.start()
             
-            # Launch browser
-            browser = await manager.launch_browser("chrome")
-            assert browser is not None
+            # Create agent with natural language task
+            agent = await manager.create_agent("Navigate to example.com and check the page title", "test_agent")
+            assert agent is not None
             
-            # Navigate to a page
-            await browser.go_to("https://example.com")
-            
-            # Get page title
-            title = await browser.get_title()
-            assert "Example" in title
-            
-            # Close browser
-            await manager.close_browser("chrome")
+            # Run natural language task
+            result = await agent.run()
+            assert result
             
         finally:
             await manager.stop()
@@ -44,26 +39,18 @@ class TestIntegration:
     async def test_profile_based_testing(self):
         """Test browser launch with different profiles"""
         manager = BrowserManager()
-        profile_manager = ProfileManager()
         
         try:
             await manager.start()
             
-            # Get available profiles
-            chrome_profiles = profile_manager.get_profiles_by_browser("chrome")
-            if chrome_profiles:
-                profile_name = chrome_profiles[0].name
-                
-                # Launch browser with profile
-                browser = await manager.launch_browser("chrome", profile_name)
-                assert browser is not None
-                
-                # Test navigation
-                await browser.go_to("https://httpbin.org/user-agent")
-                
-                # Close browser
-                await manager.close_browser("chrome", profile_name)
-        
+            # Create agent with task
+            agent = await manager.create_agent("Access https://httpbin.org/user-agent and check the user-agent information", "test_profile_agent")
+            assert agent is not None
+            
+            # Run task
+            result = await agent.run()
+            assert result
+            
         finally:
             await manager.stop()
     
@@ -73,19 +60,21 @@ class TestIntegration:
         """Test full test execution pipeline"""
         runner = TestRunner()
         
-        # Define a simple test
-        async def simple_test(browser):
-            await browser.go_to("https://example.com")
-            title = await browser.get_title()
-            assert "Example" in title
-        
-        # Register test
-        runner.register_test(
+        # Define a simple test with natural language instructions
+        @weblens_test(
             name="simple_integration_test",
-            description="Simple integration test",
-            test_function=simple_test,
-            browsers=["chrome"],
-            profiles=[None]
+            description="Navigate to example.com and verify the title contains 'Example'"
+        )
+        async def simple_test(browser):
+            result = await browser.run()
+            assert result
+        
+        # Register the test
+        info = simple_test._weblens_test_info
+        runner.register_test(
+            name=info["name"],
+            description=info["description"],
+            test_function=simple_test
         )
         
         # Run tests
@@ -94,7 +83,7 @@ class TestIntegration:
         # Verify results
         assert len(results) == 1
         assert results[0].status == "passed"
-        assert results[0].name == "simple_integration_test_chrome_default"
+        assert results[0].name == "simple_integration_test"
     
     @pytest.mark.asyncio
     async def test_profile_creation_and_usage(self):
@@ -129,18 +118,21 @@ class TestIntegration:
         runner = TestRunner()
         
         # Define a test that will fail
+        @weblens_test(
+            name="failing_integration_test",
+            description="Click on a non-existent element on example.com"
+        )
         async def failing_test(browser):
-            await browser.go_to("https://example.com")
+            # Natural language instruction likely to fail
+            await browser.execute_natural_language("Click on the non-existent-button that doesn't exist on example.com")
             # This should fail
-            await browser.click("#non-existent-element")
         
         # Register test
+        info = failing_test._weblens_test_info
         runner.register_test(
-            name="failing_integration_test",
-            description="Test that should fail",
-            test_function=failing_test,
-            browsers=["chrome"],
-            profiles=[None]
+            name=info["name"],
+            description=info["description"],
+            test_function=failing_test
         )
         
         # Run tests
@@ -151,8 +143,8 @@ class TestIntegration:
         assert results[0].status == "failed"
         assert results[0].error_message is not None
         
-        # Check if screenshot was taken (if enabled)
-        if config.test_config.screenshot_on_failure and results[0].screenshot_path:
+        # Check if screenshot was taken
+        if results[0].screenshot_path:
             screenshot_path = Path(results[0].screenshot_path)
             assert screenshot_path.exists()
     
@@ -165,29 +157,17 @@ class TestIntegration:
         try:
             await manager.start()
             
-            # Launch multiple browsers
-            chrome_browser = await manager.launch_browser("chrome", "profile1")
-            firefox_browser = await manager.launch_browser("firefox", "profile2")
+            # Create multiple agents with different tasks
+            agent1 = await manager.create_agent("Navigate to example.com and check the title", "agent1")
+            agent2 = await manager.create_agent("Go to httpbin.org and check the title", "agent2")
             
-            # Test both browsers
-            await chrome_browser.go_to("https://example.com")
-            await firefox_browser.go_to("https://httpbin.org")
+            # Run tasks
+            result1 = await agent1.run()
+            result2 = await agent2.run()
             
-            # Get titles
-            chrome_title = await chrome_browser.get_title()
-            firefox_title = await firefox_browser.get_title()
-            
-            assert "Example" in chrome_title
-            assert "httpbin" in firefox_title.lower()
-            
-            # Verify browser instances are tracked
-            active_browsers = manager.list_active_browsers()
-            assert "chrome_profile1" in active_browsers
-            assert "firefox_profile2" in active_browsers
-            
-            # Close browsers
-            await manager.close_browser("chrome", "profile1")
-            await manager.close_browser("firefox", "profile2")
+            # Verify results
+            assert result1
+            assert result2
             
         finally:
             await manager.stop()
@@ -203,37 +183,28 @@ class TestE2EScenarios:
         """Test a complete user journey"""
         runner = TestRunner()
         
+        @weblens_test(
+            name="user_journey_e2e",
+            description=(
+                "Navigate to https://httpbin.org/forms/post, fill out the form with name 'Integration Test User', "
+                "phone '555-0123', and email 'test@weblens.com'. Select 'medium' from the size dropdown. "
+                "Submit the form and verify it was successful. Then navigate to https://httpbin.org/json "
+                "and verify the page contains 'slideshow'."
+            ),
+            tags=["e2e", "user-journey"]
+        )
         async def user_journey_test(browser):
-            # Step 1: Navigate to a form page
-            await browser.go_to("https://httpbin.org/forms/post")
-            
-            # Step 2: Fill out the form
-            await browser.fill_input("input[name='custname']", "Integration Test User")
-            await browser.fill_input("input[name='custtel']", "555-0123")
-            await browser.fill_input("input[name='custemail']", "test@weblens.com")
-            
-            # Step 3: Select dropdown option
-            await browser.select_option("select[name='size']", "medium")
-            
-            # Step 4: Submit form
-            await browser.click("input[type='submit']")
-            
-            # Step 5: Verify submission
-            await browser.wait_for_element("pre", timeout=10)
-            
-            # Step 6: Navigate to another page
-            await browser.go_to("https://httpbin.org/json")
-            
-            # Step 7: Verify JSON response
-            content = await browser.get_text("body")
-            assert "slideshow" in content
+            # Use natural language approach
+            result = await browser.run()
+            assert result
         
         # Register and run test
+        info = user_journey_test._weblens_test_info
         runner.register_test(
-            name="user_journey_e2e",
-            description="Complete user journey test",
+            name=info["name"],
+            description=info["description"],
             test_function=user_journey_test,
-            browsers=["chrome"]
+            tags=info["tags"]
         )
         
         results = await runner.run_tests(parallel=False)
@@ -247,43 +218,40 @@ class TestE2EScenarios:
     async def test_responsive_testing_workflow(self):
         """Test responsive design testing workflow"""
         runner = TestRunner()
-        profile_manager = ProfileManager()
         
-        async def responsive_test(browser):
-            # Navigate to a responsive site
-            await browser.go_to("https://getbootstrap.com/docs/5.3/examples/")
-            
-            # Take screenshot for current viewport
-            await browser.take_screenshot()
-            
-            # Check for responsive elements
-            try:
-                # Try to find mobile menu toggle (present on mobile/tablet)
-                mobile_toggle = await browser.find_element(".navbar-toggler")
-                if mobile_toggle:
-                    await browser.click(".navbar-toggler")
-            except:
-                # Likely desktop view, no mobile toggle
-                pass
-            
-            # Verify page loaded correctly
-            title = await browser.get_title()
-            assert "Bootstrap" in title
-        
-        # Register test for different profiles
-        runner.register_test(
+        @weblens_test(
             name="responsive_e2e",
-            description="Responsive design E2E test",
+            description=(
+                "Navigate to https://getbootstrap.com/docs/5.3/examples/. "
+                "Take a screenshot of the page. "
+                "If there is a mobile menu toggle button visible, click on it. "
+                "Verify that the page title contains 'Bootstrap'"
+            ),
+            tags=["e2e", "responsive"]
+        )
+        async def responsive_test(browser):
+            # Use natural language approach
+            result = await browser.run()
+            assert result
+            
+            # Take screenshot
+            screenshot_path = await browser.take_screenshot()
+            assert screenshot_path
+        
+        # Register test
+        info = responsive_test._weblens_test_info
+        runner.register_test(
+            name=info["name"],
+            description=info["description"],
             test_function=responsive_test,
-            browsers=["chrome"],
-            profiles=["desktop_chrome", "tablet", "mobile_chrome"]
+            tags=info["tags"]
         )
         
         results = await runner.run_tests(parallel=False)
         
-        # Should have 3 results (one for each profile)
-        assert len(results) == 3
-        assert all(r.status == "passed" for r in results)
+        # Should have 1 result
+        assert len(results) == 1
+        assert results[0].status == "passed"
 
 
 # Markers for different test categories

@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 import importlib.util
 from typing import Union, Optional, List
+import textwrap
 
 
 # Add project root to path
@@ -16,6 +17,74 @@ sys.path.insert(0, str(Path(__file__).parent))
 from weblens import BrowserManager, TestRunner, ProfileManager
 from weblens.utils.logger import setup_logging, get_logger
 from weblens.config import config
+
+# Constants for natural language templates
+NATURAL_LANGUAGE_TEMPLATE = """#!/usr/bin/env python3
+\"\"\"
+WebLens Natural Language Test Example
+\"\"\"
+import asyncio
+import sys
+from pathlib import Path
+
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from weblens.core.test_runner import weblens_test, TestRunner
+from weblens.utils.logger import setup_logging, get_logger
+
+# Setup logging
+setup_logging(level="INFO")
+logger = get_logger(__name__)
+
+
+@weblens_test(
+    name="{test_name}",
+    description="{test_description}",
+    tags=[{tags}]
+)
+async def test_natural_language(browser):
+    \"\"\"Test using natural language instructions\"\"\"
+    result = await browser.run()
+    logger.info(f"Test result: {{result}}")
+    
+    # Add your assertions here
+    assert result, "Test should return a result"
+
+
+async def main():
+    \"\"\"Main function to run tests\"\"\"
+    runner = TestRunner()
+    
+    # Register test function
+    info = test_natural_language._weblens_test_info
+    runner.register_test(
+        name=info["name"],
+        description=info["description"],
+        test_function=test_natural_language,
+        tags=info["tags"]
+    )
+    
+    try:
+        logger.info(f"Running test: {{info['name']}}")
+        results = await runner.run_tests(
+            test_names=[info["name"]],
+            parallel=False
+        )
+        
+        # Print summary
+        passed = len([r for r in results if r.status == "passed"])
+        failed = len([r for r in results if r.status == "failed"])
+        logger.info(f"Tests completed: {{passed}} passed, {{failed}} failed")
+        
+    except Exception as e:
+        logger.error(f"Error running tests: {{e}}")
+        raise
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+"""
 
 
 def load_test_module(module_path: Union[str, Path]):
@@ -37,8 +106,6 @@ def load_test_module(module_path: Union[str, Path]):
 
 
 async def run_tests_from_module(module_path: str, 
-                               browsers: Optional[List[str]] = None,
-                               profiles: Optional[List[str]] = None,
                                tags: Optional[List[str]] = None,
                                parallel: bool = True,
                                test_names: Optional[List[str]] = None):
@@ -167,19 +234,90 @@ async def create_profile_interactive():
         print(f"Viewport: {profile.viewport['width']}x{profile.viewport['height']}")
 
 
+def generate_natural_language_test(test_name: str, test_description: str, output_path: str, tags: Optional[List[str]] = None):
+    """Generate a natural language test template"""
+    logger = get_logger(__name__)
+    
+    if not test_name:
+        raise ValueError("Test name is required")
+    if not test_description:
+        raise ValueError("Test description is required")
+    if not output_path:
+        raise ValueError("Output path is required")
+    
+    # Format tags for template
+    tags_str = ', '.join([f'"{tag}"' for tag in tags]) if tags else '"natural-language"'
+    
+    # Generate content from template
+    content = NATURAL_LANGUAGE_TEMPLATE.format(
+        test_name=test_name,
+        test_description=test_description,
+        tags=tags_str
+    )
+    
+    # Ensure path has .py extension
+    if not output_path.endswith('.py'):
+        output_path += '.py'
+    
+    # Write to file
+    output_file = Path(output_path)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(output_file, 'w') as f:
+        f.write(content)
+    
+    # Make file executable
+    output_file.chmod(output_file.stat().st_mode | 0o111)  # Add execute permission
+    
+    logger.info(f"Generated natural language test template: {output_file}")
+    print(f"✅ Natural language test template generated: {output_file}")
+    return output_path
+
+
+def generate_test_interactive():
+    """Interactive natural language test generation"""
+    print("Generate Natural Language Test")
+    print("=" * 30)
+    
+    test_name = input("Test name: ").strip()
+    if not test_name:
+        print("Test name is required")
+        return
+    
+    print("\nEnter test description (natural language instructions for the browser):")
+    print("Example: Go to example.com, check the page title, and click on the first link")
+    test_description = input("> ").strip()
+    if not test_description:
+        print("Test description is required")
+        return
+    
+    tags_input = input("\nTags (comma-separated, optional): ").strip()
+    tags = [tag.strip() for tag in tags_input.split(',')] if tags_input else []
+    
+    default_path = f"nl_test_{test_name.lower().replace(' ', '_')}.py"
+    output_path = input(f"\nOutput file path (default: {default_path}): ").strip() or default_path
+    
+    try:
+        generate_natural_language_test(test_name, test_description, output_path, tags)
+    except Exception as e:
+        print(f"Error generating test: {e}")
+
+
 def main():
     """Main CLI function"""
     parser = argparse.ArgumentParser(
-        description="WebLens - Advanced Web Testing Framework",
+        description="WebLens - Advanced Web Testing Framework with Natural Language",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  weblens run examples/basic_tests.py
-  weblens run tests/ --browsers chrome firefox --parallel
-  weblens run tests/ --tags smoke --profiles desktop_chrome
-  weblens profiles list
-  weblens profiles create
-        """
+        epilog=textwrap.dedent("""
+        Examples:
+          weblens run examples/basic_tests.py
+          weblens run tests/ --parallel
+          weblens run tests/ --tags smoke
+          weblens generate --name "Login Test" --description "Go to example.com/login, enter username and password, click login"
+          weblens generate interactive
+          weblens profiles list
+          weblens profiles create
+        """)
     )
     
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
@@ -187,11 +325,6 @@ Examples:
     # Run command
     run_parser = subparsers.add_parser('run', help='Run tests')
     run_parser.add_argument('path', help='Path to test file or directory')
-    run_parser.add_argument('--browsers', nargs='+', default=['chrome'],
-                           choices=['chrome', 'firefox', 'safari', 'edge'],
-                           help='Browsers to test (default: chrome)')
-    run_parser.add_argument('--profiles', nargs='+',
-                           help='Profiles to use (default: all available)')
     run_parser.add_argument('--tags', nargs='+',
                            help='Filter tests by tags')
     run_parser.add_argument('--tests', nargs='+',
@@ -203,6 +336,24 @@ Examples:
     run_parser.add_argument('--log-level', default='INFO',
                            choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
                            help='Log level (default: INFO)')
+    run_parser.add_argument('--natural-language', action='store_true',
+                           help='Flag to indicate this is a direct natural language test')
+    run_parser.add_argument('--description',
+                           help='Natural language description for the test (requires --natural-language)')
+    
+    # Generate command
+    generate_parser = subparsers.add_parser('generate', help='Generate natural language test templates')
+    generate_subparsers = generate_parser.add_subparsers(dest='generate_command')
+    
+    # Interactive generation
+    generate_subparsers.add_parser('interactive', help='Generate test template interactively')
+    
+    # Direct generation
+    direct_gen_parser = generate_subparsers.add_parser('template', help='Generate test template with parameters')
+    direct_gen_parser.add_argument('--name', required=True, help='Test name')
+    direct_gen_parser.add_argument('--description', required=True, help='Natural language test description')
+    direct_gen_parser.add_argument('--output', required=True, help='Output file path')
+    direct_gen_parser.add_argument('--tags', nargs='+', help='Optional tags for the test')
     
     # Profiles command
     profiles_parser = subparsers.add_parser('profiles', help='Manage browser profiles')
@@ -234,8 +385,6 @@ Examples:
         # Run tests
         success = asyncio.run(run_tests_from_module(
             module_path=args.path,
-            browsers=args.browsers,
-            profiles=args.profiles,
             tags=args.tags,
             test_names=args.tests,
             parallel=parallel
@@ -250,6 +399,23 @@ Examples:
             asyncio.run(create_profile_interactive())
         else:
             profiles_parser.print_help()
+    
+    elif args.command == 'generate':
+        if args.generate_command == 'interactive':
+            generate_test_interactive()
+        elif args.generate_command == 'template':
+            try:
+                generate_natural_language_test(
+                    test_name=args.name,
+                    test_description=args.description,
+                    output_path=args.output,
+                    tags=args.tags
+                )
+            except Exception as e:
+                print(f"Error generating test: {e}")
+                sys.exit(1)
+        else:
+            parser.parse_args(['generate', '--help'])
 
 
 if __name__ == "__main__":

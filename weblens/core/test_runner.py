@@ -20,8 +20,6 @@ logger = get_logger(__name__)
 class TestResult:
     """Test execution result"""
     name: str
-    browser: str
-    profile: Optional[str]
     status: str  # "passed", "failed", "skipped"
     duration: float
     error_message: Optional[str] = None
@@ -51,7 +49,7 @@ class TestRunner:
                      description: str,
                      test_function: Callable,
                      tags: Optional[List[str]] = None):
-        """Register a test case using natural language approach"""
+        """Register a test case"""
         test_case = TestCase(
             name=name,
             description=description,
@@ -64,17 +62,15 @@ class TestRunner:
     async def run_single_test(self, 
                             test_case: TestCase, 
                             task_description: Optional[str] = None) -> TestResult:
-        """Run a single test case using browser-use cloud with natural language instructions"""
+        """Run a single test case using browser-use cloud"""
         start_time = time.time()
         test_name = f"{test_case.name}_{int(start_time)}"
         
         logger.info(f"Running test: {test_name}")
         
         try:
-            # Create agent for this test with natural language description
+            # Create agent for this test
             task = task_description or test_case.description or f"Execute test: {test_case.name}"
-            
-            # Create agent with natural language instructions
             agent = await self.browser_manager.create_agent(task, test_name)
             
             # Execute test function with agent
@@ -86,8 +82,6 @@ class TestRunner:
             duration = time.time() - start_time
             result = TestResult(
                 name=test_name,
-                browser="browser-use",
-                profile=None,
                 status="passed",
                 duration=duration
             )
@@ -100,8 +94,6 @@ class TestRunner:
             
             result = TestResult(
                 name=test_name,
-                browser="browser-use",
-                profile=None,
                 status="failed",
                 duration=duration,
                 error_message=error_message
@@ -220,8 +212,6 @@ class TestRunner:
             "results": [
                 {
                     "name": r.name,
-                    "browser": r.browser,
-                    "profile": r.profile,
                     "status": r.status,
                     "duration": r.duration,
                     "error_message": r.error_message,
