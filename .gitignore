@@ -145,6 +145,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*.bak
 
 # Spyder project settings
 .spyderproject
@@ -204,3 +205,5 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 scratchpad.md
+input
+output
