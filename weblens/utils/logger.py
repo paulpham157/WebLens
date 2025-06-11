@@ -4,13 +4,22 @@ Logging utilities for WebLens
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 from datetime import datetime
 
 from rich.logging import RichHandler
 from rich.console import Console
 
 from ..config import config
+
+
+class WebLensLogRecord(logging.LogRecord):
+    """Custom LogRecord with additional attributes for WebLens"""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.browser: Optional[str] = None
+        self.profile: Optional[str] = None
 
 # Global console instance
 console = Console()
@@ -25,17 +34,17 @@ class WebLensFormatter(logging.Formatter):
             datefmt="%Y-%m-%d %H:%M:%S"
         )
     
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         # Add extra context if available
-        if hasattr(record, 'browser'):
-            record.name = f"{record.name}[{record.browser}]"
-        if hasattr(record, 'profile'):
-            record.name = f"{record.name}[{record.profile}]"
+        if hasattr(record, 'browser') and getattr(record, 'browser'):
+            record.name = f"{record.name}[{getattr(record, 'browser')}]"
+        if hasattr(record, 'profile') and getattr(record, 'profile'):
+            record.name = f"{record.name}[{getattr(record, 'profile')}]"
         
         return super().format(record)
 
 
-def setup_logging(level: str = "INFO", log_file: Optional[str] = None):
+def setup_logging(level: str = "INFO", log_file: Optional[str] = None) -> Path:
     """Setup logging configuration for WebLens"""
     
     # Create logs directory
@@ -67,11 +76,11 @@ def setup_logging(level: str = "INFO", log_file: Optional[str] = None):
     # File handler
     if log_file is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_file = config.logs_dir / f"weblens_{timestamp}.log"
+        log_file_path = config.logs_dir / f"weblens_{timestamp}.log"
     else:
-        log_file = Path(log_file)
+        log_file_path = Path(log_file)
     
-    file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    file_handler = logging.FileHandler(str(log_file_path), encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)  # Always log everything to file
     
     # Custom formatter for file
@@ -84,7 +93,7 @@ def setup_logging(level: str = "INFO", log_file: Optional[str] = None):
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
     
-    return log_file
+    return log_file_path
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -99,20 +108,22 @@ class BrowserContextLogger:
         self.logger = logger
         self.browser = browser
         self.profile = profile
-        self.old_factory = None
+        self.old_factory: Optional[Any] = None
     
-    def __enter__(self):
+    def __enter__(self) -> logging.Logger:
         self.old_factory = logging.getLogRecordFactory()
         
-        def record_factory(*args, **kwargs):
-            record = self.old_factory(*args, **kwargs)
-            record.browser = self.browser
+        def record_factory(*args, **kwargs) -> logging.LogRecord:
+            record = self.old_factory(*args, **kwargs) if self.old_factory else logging.LogRecord(*args, **kwargs)
+            # Use setattr to avoid type checker issues with dynamic attributes
+            setattr(record, 'browser', self.browser)
             if self.profile:
-                record.profile = self.profile
+                setattr(record, 'profile', self.profile)
             return record
         
         logging.setLogRecordFactory(record_factory)
         return self.logger
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        logging.setLogRecordFactory(self.old_factory)
+    def __exit__(self, exc_type: Optional[type], exc_val: Optional[Exception], exc_tb: Optional[Any]) -> None:
+        if self.old_factory:
+            logging.setLogRecordFactory(self.old_factory)
