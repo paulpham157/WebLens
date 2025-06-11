@@ -15,11 +15,12 @@ Key Features:
 """
 
 __version__ = "0.1.0"
-__author__ = "Paul Pham"
-__email__ = "paulpham157@example.com"
+__author__ = "Paul Pham 157"
+__email__ = "paulpham157@gmail.com"
 
-from .core.browser_manager import BrowserManager
-from .core.test_runner import TestRunner
-from .profiles.profile_manager import ProfileManager
+from .config import Config
+from .core import BrowserManager
+from .profiles import ProfileManager
+from .utils import get_logger
 
-__all__ = ["BrowserManager", "TestRunner", "ProfileManager"]
+__all__ = ["Config", "BrowserManager", "ProfileManager", "get_logger"]

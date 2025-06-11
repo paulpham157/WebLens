@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "weblens"
 version = "0.1.0"
 description = "Advanced web testing framework using browser-use for multi-profile browser automation"
-authors = [{name = "Paul Pham", email = "paulpham157@example.com"}]
+authors = [{name = "Paul Pham 157", email = "paulpham157@gmail.com"}]
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.9"

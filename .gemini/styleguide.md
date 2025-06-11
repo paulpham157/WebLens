@@ -37,19 +37,12 @@ This document outlines the programming rules and code conventions for the WebLen
 * **Context:** Logs must have sufficient context for debugging when needed.
 * **Structure:** Consistent log format: time, level, module, message.
 
-## Testing
-* **Test Coverage:** Each core component must have unit tests and integration tests.
-* **Mocking:** Use mock objects for browser-use cloud API in tests.
-* **Naming:** Test names must clearly describe the behavior being tested, format: test_{function}_{scenario}_{expected_result}.
-
 ## Documentation
-
 * **README:** Update the README when API or usage changes occur.
 * **Examples:** Each new feature must have examples in the examples/ directory.
 * **CHANGELOG:** Update the CHANGELOG for each new version.
 
 ## Git Workflow
-
 * **Commit Messages:** Prefix with change type: feat:, fix:, docs:, test:, refactor:
 * **Branch Naming:** feature/{feature-name}, bugfix/{issue-number}
 * **Pull Requests:** Fully describe changes, attach screenshots if related to UI
@@ -57,14 +50,12 @@ This document outlines the programming rules and code conventions for the WebLen
 * **CI/CD:** All tests must pass on CI before merging
 
 ## Standard Libraries and Dependencies
-
 * **Browser-use:** Use browser-use cloud API as the core for automation
 * **Python-dotenv:** Manage environment variables and API keys
 * **Conda:** Use Conda to manage development environments
 * **pytest:** Main testing framework for the project
 
 ## Special Rules
-
 * **Don't use Playwright directly:** All browser interactions must go through the browser-use cloud API
 * **Always fallback gracefully:** Provide mock functionality when no API key is available
 * **Always check version** when releasing a new version

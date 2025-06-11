@@ -38,7 +38,7 @@ class Config:
         self.browser_use_base_url = os.getenv("BROWSER_USE_BASE_URL", "https://api.browser-use.com/api/v1")
         
         # Test settings
-        self.test_base_url = os.getenv("TEST_BASE_URL", "https://example.com")
+        self.test_base_url = os.getenv("TEST_BASE_URL", "https://practicetestautomation.com/practice-test-login/")
         self.test_parallel_workers = int(os.getenv("TEST_PARALLEL_WORKERS", "3"))
         self.test_timeout = int(os.getenv("TEST_TIMEOUT", "30000"))
         

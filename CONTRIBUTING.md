@@ -1,13 +1,13 @@
 # Contributing to WebLens
 
-Cảm ơn bạn đã quan tâm đến việc đóng góp cho WebLens! 🎉
+Thank you for your interest in contributing to WebLens! 🎉
 
 ## Development Setup
 
 1. Fork repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/your-username/WebLens.git
+   git clone https://github.com/paulpham157/WebLens.git
    cd WebLens
    ```
 
@@ -20,7 +20,7 @@ Cảm ơn bạn đã quan tâm đến việc đóng góp cho WebLens! 🎉
 4. Setup development environment:
    ```bash
    ./setup.sh
-   # hoặc
+   # or
    make setup
    ```
 
