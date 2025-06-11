@@ -131,8 +131,8 @@ profile = pm.create_profile(
     browser="chrome",
     user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)",
     viewport={"width": 375, "height": 812},
-    locale="en-US",
-    timezone="America/New_York"
+    locale="vi-VN",
+    timezone="Asia/Ho_Chi_Minh"
 )
 
 # Clone existing profile
@@ -423,4 +423,4 @@ Besides this guide, WebLens provides other in-depth documentation:
 
 ## 📝 Recent Changes
 
-WebLens has transitioned to using a fully natural language approach through the browser-use API. For details about these changes, please refer to the [change log document](./docs/THAY_DOI.md).
+WebLens has transitioned to using a fully natural language approach through the browser-use API. For details about these changes, please refer to the [change log document](../../CHANGELOG.md).
