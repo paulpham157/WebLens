@@ -1,72 +1,72 @@
-# Style Guide cho Dự Án WebLens
+# Style Guide for WebLens Project
 
 # Important
 When chatting with the user, use Vietnamese language to explain to the user.
 
 # Introduction
-Tài liệu này đưa ra các quy tắc lập trình và quy ước code cho dự án WebLens. WebLens là một framework testing hiện đại được phát triển để thay thế các framework BDD truyền thống, sử dụng browser-use cloud API để tự động hóa trình duyệt.
+This document outlines the programming rules and code conventions for the WebLens project. WebLens is a modern testing framework developed to replace traditional BDD frameworks, using browser-use cloud API for browser automation.
 
 # Key Principles
-* **Readability:** Code phải dễ đọc và dễ hiểu cho tất cả thành viên trong team.
-* **Maintainability:** Code phải dễ sửa đổi và mở rộng khi cần thiết.
-* **Consistency:** Tuân thủ style thống nhất giúp nâng cao hiệu quả làm việc nhóm và giảm lỗi.
-* **Performance:** Hiệu suất cũng quan trọng, đặc biệt là với framework testing.
-* **Cloud-First:** Thiết kế luôn hướng đến việc sử dụng cloud API thay vì local browsers.
+* **Readability:** Code must be easy to read and understand for all team members.
+* **Maintainability:** Code must be easy to modify and extend when necessary.
+* **Consistency:** Adherence to a consistent style improves team efficiency and reduces errors.
+* **Performance:** Performance is also important, especially for testing frameworks.
+* **Cloud-First:** Design always prioritizes using cloud APIs rather than local browsers.
 
 # Coding Conventions
 
-## Indentation và Formatting
-* **Sử dụng 4 khoảng trắng cho mỗi cấp indent.**
-* **Tối đa 120 ký tự trên một dòng.**
-* **Blank lines:** Sử dụng 2 dòng trống giữa các class, 1 dòng trống giữa các method.
+## Indentation and Formatting
+* **Use 4 spaces for each level of indentation.**
+* **Maximum 120 characters per line.**
+* **Blank lines:** Use 2 blank lines between classes, 1 blank line between methods.
 
-## Quy Tắc Python
-* **Docstrings:** Tất cả module, class và function phải có docstring theo chuẩn Google Python Style.
-* **Type Hints:** Luôn sử dụng type hints cho parameters và return types.
-* **Imports:** Sắp xếp theo thứ tự: standard library, third-party packages, local imports.
-* **Async/Await:** Sử dụng async/await nhất quán, không trộn lẫn với các phương pháp non-async.
+## Python Rules
+* **Docstrings:** All modules, classes, and functions must have docstrings following the Google Python Style.
+* **Type Hints:** Always use type hints for parameters and return types.
+* **Imports:** Arrange in order: standard library, third-party packages, local imports.
+* **Async/Await:** Use async/await consistently, don't mix with non-async methods.
 
-## Kiến Trúc WebLens
-* **Browser Management:** Luôn sử dụng browser-use cloud API, không sử dụng Playwright trực tiếp.
-* **Configuration:** Sử dụng `.env` cho cấu hình, không hardcode API keys hoặc thông tin nhạy cảm.
-* **Tests:** Sử dụng TestRunner API mới (không còn tham số browsers và profiles).
-* **Error Handling:** Đảm bảo xử lý lỗi chi tiết và có cơ chế fallback.
+## WebLens Architecture
+* **Browser Management:** Always use browser-use cloud API, don't use Playwright directly.
+* **Configuration:** Use `.env` for configuration, don't hardcode API keys or sensitive information.
+* **Tests:** Use the new TestRunner API (no longer using browsers and profiles parameters).
+* **Error Handling:** Ensure detailed error handling and fallback mechanisms.
 
 ## Logging
-* **Log Levels:** Sử dụng đúng log level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
-* **Context:** Logs phải có đủ context để debug khi cần thiết.
-* **Cấu trúc:** Format log thống nhất: thời gian, mức độ, module, message.
+* **Log Levels:** Use appropriate log levels (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+* **Context:** Logs must have sufficient context for debugging when needed.
+* **Structure:** Consistent log format: time, level, module, message.
 
 ## Testing
-* **Test Coverage:** Mỗi thành phần core phải có unit tests, integration tests.
-* **Mocking:** Sử dụng mock objects cho browser-use cloud API trong tests.
-* **Naming:** Tên test phải mô tả rõ hành vi đang test, format: test_{function}_{scenario}_{expected_result}.
+* **Test Coverage:** Each core component must have unit tests and integration tests.
+* **Mocking:** Use mock objects for browser-use cloud API in tests.
+* **Naming:** Test names must clearly describe the behavior being tested, format: test_{function}_{scenario}_{expected_result}.
 
 ## Documentation
 
-* **README:** Cập nhật README khi có thay đổi API hoặc cách sử dụng.
-* **Examples:** Mỗi tính năng mới phải có ví dụ trong thư mục examples/.
-* **CHANGELOG:** Cập nhật CHANGELOG cho mỗi phiên bản mới.
+* **README:** Update the README when API or usage changes occur.
+* **Examples:** Each new feature must have examples in the examples/ directory.
+* **CHANGELOG:** Update the CHANGELOG for each new version.
 
 ## Git Workflow
 
-* **Commit Messages:** Prefix với loại thay đổi: feat:, fix:, docs:, test:, refactor:
+* **Commit Messages:** Prefix with change type: feat:, fix:, docs:, test:, refactor:
 * **Branch Naming:** feature/{feature-name}, bugfix/{issue-number}
-* **Pull Requests:** Mô tả đầy đủ thay đổi, đính kèm screenshots nếu liên quan đến UI
-* **Code Reviews:** Mỗi PR phải được review bởi ít nhất 1 team member khác
-* **CI/CD:** Tất cả tests phải pass trên CI trước khi merge
+* **Pull Requests:** Fully describe changes, attach screenshots if related to UI
+* **Code Reviews:** Each PR must be reviewed by at least 1 other team member
+* **CI/CD:** All tests must pass on CI before merging
 
-## Standard Libraries và Dependencies
+## Standard Libraries and Dependencies
 
-* **Browser-use:** Sử dụng browser-use cloud API làm cốt lõi cho automation
-* **Python-dotenv:** Quản lý biến môi trường và API keys
-* **Conda:** Sử dụng Conda để quản lý môi trường phát triển
-* **pytest:** Framework testing chính cho dự án
+* **Browser-use:** Use browser-use cloud API as the core for automation
+* **Python-dotenv:** Manage environment variables and API keys
+* **Conda:** Use Conda to manage development environments
+* **pytest:** Main testing framework for the project
 
-## Quy Định Đặc Biệt
+## Special Rules
 
-* **Không sử dụng Playwright trực tiếp:** Mọi tương tác với browser phải thông qua browser-use cloud API
-* **Luôn fallback gracefully:** Cung cấp mock functionality khi không có API key
-* **Luôn check version** khi tung ra bản mới
-* **Nhất quán API:** Không sử dụng tham số browsers và profiles cho hàm run_tests()
-* **Bảo mật API keys:** Không bao giờ commit API keys thật vào repository
+* **Don't use Playwright directly:** All browser interactions must go through the browser-use cloud API
+* **Always fallback gracefully:** Provide mock functionality when no API key is available
+* **Always check version** when releasing a new version
+* **Consistent API:** Don't use browsers and profiles parameters for run_tests() function
+* **Secure API keys:** Never commit real API keys to the repository
