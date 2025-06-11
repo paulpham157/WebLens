@@ -58,13 +58,13 @@ cp .env.example .env
 
 ```bash
 # Run basic tests
-python weblens_cli.py run examples/basic_tests.py
+python weblens_cli.py run examples/natural_language_test.py
 
 # Run tests by tags
-python weblens_cli.py run examples/basic_tests.py --tags smoke navigation
+python weblens_cli.py run examples/natural_language_test.py --tags smoke navigation
 
 # Run tests sequentially (no parallelism)
-python weblens_cli.py run examples/basic_tests.py --sequential
+python weblens_cli.py run examples/natural_language_test.py --sequential
 
 # View list of profiles
 python weblens_cli.py profiles list
@@ -423,4 +423,4 @@ Besides this guide, WebLens provides other in-depth documentation:
 
 ## 📝 Recent Changes
 
-WebLens has transitioned to using a fully natural language approach through the browser-use API. For details about these changes, please refer to the [change log document](../../CHANGELOG.md).
+WebLens has transitioned to using a fully natural language approach through the browser-use API. For details about these changes, please refer to the [change log document](CHANGELOG.md).
