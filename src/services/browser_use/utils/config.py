@@ -93,7 +93,7 @@ TEST_TIMEOUT=30000
 
 # Optional: Logging
 LOG_LEVEL=INFO
-LOG_FILE=logs/weblens.log
+LOG_FILE=logs/testlens.log
 """
         
         with open(".env.example", "w") as f:

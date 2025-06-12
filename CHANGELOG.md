@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the WebLens project will be documented in this file.
+All notable changes to the testlens project will be documented in this file.
 
 ## [Unreleased]
 

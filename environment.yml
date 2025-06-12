@@ -1,4 +1,4 @@
-name: weblens
+name: testlens
 channels:
   - conda-forge
   - defaults

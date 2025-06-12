@@ -1,20 +1,20 @@
-# Contributing to WebLens
+# Contributing to testlens
 
-Thank you for your interest in contributing to WebLens! 🎉
+Thank you for your interest in contributing to testlens! 🎉
 
 ## Development Setup
 
 1. Fork repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/paulpham157/WebLens.git
-   cd WebLens
+   git clone https://github.com/paulpham157/testlens.git
+   cd testlens
    ```
 
 3. Create conda environment:
    ```bash
    conda env create -f environment.yml
-   conda activate weblens
+   conda activate testlens
    ```
 
 4. Setup development environment:
@@ -31,7 +31,7 @@ Thank you for your interest in contributing to WebLens! 🎉
 
 ## Code Style
 
-WebLens follows Python best practices:
+testlens follows Python best practices:
 
 - **Formatting**: Use `black` for code formatting
 - **Linting**: Use `flake8` for linting
@@ -71,7 +71,7 @@ pytest tests/unit/test_core.py -v
 Example test:
 ```python
 import pytest
-from weblens import BrowserManager
+from testlens import BrowserManager
 
 class TestBrowserManager:
     def test_initialization(self):
@@ -138,7 +138,7 @@ When reporting bugs, please include:
 1. **Environment details**:
    - OS and version
    - Python version
-   - WebLens version
+   - testlens version
    - Browser versions
 
 2. **Steps to reproduce**

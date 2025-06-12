@@ -1,10 +1,10 @@
-# Style Guide for WebLens Project
+# Style Guide for testlens Project
 
 # Important
 When chatting with the user, use Vietnamese language to explain to the user.
 
 # Introduction
-This document outlines the programming rules and code conventions for the WebLens project. WebLens is a modern testing framework developed to replace traditional BDD frameworks, using browser-use cloud API for browser automation.
+This document outlines the programming rules and code conventions for the testlens project. testlens is a modern testing framework developed to replace traditional BDD frameworks, using browser-use cloud API for browser automation.
 
 # Key Principles
 * **Readability:** Code must be easy to read and understand for all team members.
@@ -26,7 +26,7 @@ This document outlines the programming rules and code conventions for the WebLen
 * **Imports:** Arrange in order: standard library, third-party packages, local imports.
 * **Async/Await:** Use async/await consistently, don't mix with non-async methods.
 
-## WebLens Architecture
+## testlens Architecture
 * **Browser Management:** Always use browser-use cloud API, don't use Playwright directly.
 * **Configuration:** Use `.env` for configuration, don't hardcode API keys or sensitive information.
 * **Tests:** Use the new TestRunner API (no longer using browsers and profiles parameters).
